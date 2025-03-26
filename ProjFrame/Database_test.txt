@@ -1,0 +1,2 @@
+new.img imgs := png(path.file(asdf/zxvc/qwer.png));
+out.img :=imgs;
