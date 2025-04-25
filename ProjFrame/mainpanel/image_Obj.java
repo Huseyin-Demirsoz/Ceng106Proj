@@ -1,3 +1,4 @@
+package mainpanel;
 public class image_Obj {
 
 

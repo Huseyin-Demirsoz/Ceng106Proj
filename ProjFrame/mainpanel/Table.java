@@ -1,3 +1,4 @@
+package mainpanel;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -7,9 +8,10 @@ public class Table implements Table_methods {
 
     public ArrayList<image_Obj> tbl ;
 
-    private File file ;
+    //şimdilik debug publictir TODO
+    public File file ;
 
-    private String inputAdd;
+    private  String inputAdd;
 
     private String outputAdd;
 
@@ -34,7 +36,6 @@ public class Table implements Table_methods {
         FileWriter writer = new FileWriter(file,true);
 
         writer.write(content + System.lineSeparator());// Exception eklemeyi unutma.
-
 
         writer.close();
 

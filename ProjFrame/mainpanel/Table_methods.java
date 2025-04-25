@@ -1,3 +1,4 @@
+package mainpanel;
 import java.io.IOException;
 
 public interface Table_methods {

@@ -7,6 +7,8 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -41,6 +43,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
 import mainpanel.FileListDataModel;
+import mainpanel.DataBase;
+
+import org.opencv.*;
 
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
@@ -50,8 +55,8 @@ import javax.swing.SwingConstants;
 public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private static JFrame frame;
 	private JPanel contentPane;
+	private DataBase database;
 
 	/*
 	The main function dispatches the public constructor as a main thread
@@ -60,9 +65,8 @@ public class Main extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Main framex = new Main();
-					frame = framex;
-					framex.setVisible(true);
+					Main frame = new Main();
+					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -77,7 +81,9 @@ public class Main extends JFrame {
 		this.setBounds(100, 100, 800, 500);
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+		
+		database = new DataBase();
+		
 		this.setContentPane(contentPane);
 		this.contentPane.setLayout(new BorderLayout(0, 0));
 		
@@ -113,6 +119,22 @@ public class Main extends JFrame {
 		});
 		scrollPane.setViewportView(list);
 		
+		//input klasöründeki tüm dosyaları listeye almak için
+		DataBase.makeDB();
+		DataBase.readDBfromFolder();
+		for(int i =0;i<DataBase.tableObj.size();i++){
+			filelistmodel.addElement(filelistmodel.addfile(DataBase.tableObj.get(i).file));
+			
+			super_list_1.addLast(new JList<DefaultListModel>());
+			
+			List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
+			
+			projlistmodel.addLast(new DefaultListModel<Object>());
+			projlistmodel.getLast().add(0,DataBase.tableObj.get(i).file.getName());
+			super_list_1.getLast().setModel(projlistmodel.getLast());
+		}
+		
+		
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		this.contentPane.add(tabbedPane, BorderLayout.NORTH);
@@ -126,6 +148,9 @@ public class Main extends JFrame {
 		
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mnFile.add(mntmOpen);
+		
+		JMenuItem mntmSave = new JMenuItem("Save");
+		mnFile.add(mntmSave);
 		
 		//IMPORTANT because of the lambda expression, local variable outside can not be changed because of scope conflict
 		mntmOpen.addActionListener(e ->{
@@ -215,11 +240,31 @@ public class Main extends JFrame {
 			gbc_btnCreate.gridx = 5;
 			gbc_btnCreate.gridy = 2;
 			dbPane.add(btnCreate, gbc_btnCreate);
-			//The lambda is usually e but since we already use e for opening the JFrame 
-			//"mntmNewDB.addActionListener(e ->{" we have to use a different variable 
-			//since it is in the scope that uses "e"
+			//
 			btnCreate.addActionListener(btn ->{
-				System.out.printf("");
+				try {
+					File file = DataBase.makeDB(textField.getText());
+					int j = 0;
+					//TODO BAD CODE
+					for(int i =0;DataBase.tableObj.get(i).file!=file && i <100;i++){
+						j++;
+					}
+					//DataBase.tableObj.get(j).Write("asdf \n");
+					
+					filelistmodel.addElement(filelistmodel.addfile(file));
+					
+					super_list_1.addLast(new JList<DefaultListModel>());
+					
+					List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
+					
+					projlistmodel.addLast(new DefaultListModel<Object>());
+					projlistmodel.getLast().add(0,file.getName());
+					super_list_1.getLast().setModel(projlistmodel.getLast());
+				} catch (IOException e1) {
+					// TODO:
+					e1.printStackTrace();
+				}
+
 			});
 			
 			JRadioButton rdbtnNewRadioButton = new JRadioButton("image");
@@ -260,9 +305,6 @@ public class Main extends JFrame {
 			newdbframe.setVisible(true);
 		});
 		
-		JMenuItem mntmSave = new JMenuItem("Save");
-		mnFile.add(mntmSave);
-		
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		mnEdit.setHorizontalAlignment(SwingConstants.LEFT);
@@ -279,17 +321,7 @@ public class Main extends JFrame {
 		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Light");
 		mnTheme.add(mntmNewMenuItem_2);
 		
-		JMenuBar menuBar_1 = new JMenuBar();
-		tabbedPane.addTab("Connection", null, menuBar_1, null);
 		
-		JButton btnConnect = new JButton("Connect");
-		menuBar_1.add(btnConnect);
-		
-		JMenu mnConnectionSettings = new JMenu("Connection Settings");
-		menuBar_1.add(mnConnectionSettings);
-		
-		JCheckBoxMenuItem chckbxmntmCancelConnectino = new JCheckBoxMenuItem("Cancel Connectino");
-		mnConnectionSettings.add(chckbxmntmCancelConnectino);
 	}
 
 }
