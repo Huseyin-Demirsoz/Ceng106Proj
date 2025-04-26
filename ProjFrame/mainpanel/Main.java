@@ -1,22 +1,21 @@
 package mainpanel;
 
 import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
@@ -29,23 +28,15 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.ImageIcon;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.image.BufferedImage;
 
-import mainpanel.FileListDataModel;
-import mainpanel.DataBase;
-
-import org.opencv.*;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.highgui.HighGui;
 
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
@@ -57,7 +48,27 @@ public class Main extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private DataBase database;
-
+	File selectedfile ;//TODO
+	final class imgpanel extends JPanel{
+		Image img;
+		protected void paintComponent(Graphics g) {
+	            super.paintComponent(g);
+	            g.setPaintMode();
+	        if (img != null) {
+	            Graphics2D g2d = (Graphics2D) g.create();
+	            int x = (getWidth() - img.getWidth(null)) / 2;
+	            int y = (getHeight() - img.getHeight(null)) / 2;
+	            g2d.drawImage(img, x, y, this);
+	            g2d.dispose();
+	        }
+	    }
+		void setimg(Image imgx){
+			img=imgx;
+		}
+	}
+	static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
 	/*
 	The main function dispatches the public constructor as a main thread
 	 */
@@ -81,11 +92,13 @@ public class Main extends JFrame {
 		this.setBounds(100, 100, 800, 500);
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		
 		database = new DataBase();
 		
 		this.setContentPane(contentPane);
-		this.contentPane.setLayout(new BorderLayout(0, 0));
+		BorderLayout mainborder= new BorderLayout();
+		mainborder.setHgap(8);
+		mainborder.setVgap(8);
+		this.contentPane.setLayout(mainborder);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		this.contentPane.add(tabbedPane_1, BorderLayout.WEST);
@@ -108,14 +121,44 @@ public class Main extends JFrame {
 		//sets the JList in the project view tab to the contents of the selected file
 		FileListDataModel filelistmodel = new FileListDataModel();
 		JList<FileListDataModel> list = new JList<FileListDataModel>(filelistmodel);
-		list.addListSelectionListener(e -> {/*OLD ACTION CODE ->*/	//new ListSelectionListener() {
-			//public void valueChanged(ListSelectionEvent e) {
-			//list_1.setModel(new AbstractListModel() {String[] values = new String[] {};public int getSize() {return values.length;}public Object getElementAt(int index) {return values[index];}});
-			//projlistmodel.addElement(list.getSelectedIndex());
-			
-
+		imgpanel mainImage = new imgpanel();
+		list.addListSelectionListener(e -> {
+			selectedfile = filelistmodel.getElementAt(list.getSelectedIndex(),true);
 			scrollPane_1.setViewportView(super_list_1.get(list.getSelectedIndex()));
-		//}
+			if(selectedfile.getName().endsWith(".jpg") || selectedfile.getName().endsWith(".png")){
+			Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(selectedfile.getAbsolutePath());
+			Image bufImage = HighGui.toBufferedImage(image_tmp);
+			//TODO
+			mainImage.setimg(bufImage);
+			this.contentPane.add(mainImage, BorderLayout.CENTER);
+			/*mainImage.setIcon((new ImageIcon(bufImage
+					.getScaledInstance(mainImage.getBounds().width+1,mainImage.getBounds().height+1,Image.SCALE_SMOOTH)
+					)));
+			*/
+			mainImage.addComponentListener(new ComponentListener() {
+			public void componentResized(ComponentEvent e) {
+				int scalex=10 ,scaley=10;
+				if(mainImage.getWidth()>mainImage.getHeight()){
+					scalex=mainImage.getHeight()*(bufImage.getWidth(null)/bufImage.getHeight(null));
+					scaley=mainImage.getHeight();
+				}else {
+					scalex=mainImage.getHeight()*(bufImage.getWidth(null)/bufImage.getHeight(null));
+					scaley=mainImage.getHeight();
+				}
+				mainImage.imageUpdate(bufImage
+						.getScaledInstance(scalex,scaley,Image.SCALE_SMOOTH), ALLBITS, EXIT_ON_CLOSE, ABORT, WIDTH, HEIGHT);
+				mainImage.repaint();
+				/*mainImage.paint(bufImage
+					.getScaledInstance(scalex,scaley,Image.SCALE_SMOOTH)
+				);*/
+			}
+				public void componentMoved(ComponentEvent e) {}
+				public void componentShown(ComponentEvent e) {}
+				public void componentHidden(ComponentEvent e) {}
+			});
+			
+			}
+			System.gc();
 		});
 		scrollPane.setViewportView(list);
 		
@@ -133,6 +176,7 @@ public class Main extends JFrame {
 			projlistmodel.getLast().add(0,DataBase.tableObj.get(i).file.getName());
 			super_list_1.getLast().setModel(projlistmodel.getLast());
 		}
+		
 		
 		
 		
@@ -164,14 +208,14 @@ public class Main extends JFrame {
 				try{
 					//file selected -> get path -> try to pull string until EOF(\\Z)
 					file = new File(xfile_chooser.getSelectedFile().getAbsolutePath());
-					try {
+					/*try {
 						//TODO: Parse file, prints out file for debug purposes
 						String xfile_content = new Scanner(file).useDelimiter("\\Z").next();
 						System.out.printf("%s\n",xfile_content);
 					} catch (FileNotFoundException e1) {
 						// TODO: Close file; handle error
 						e1.printStackTrace();
-					}
+					}*/
 				}finally{
 					if (file != null) {
 						/*//TODO: handle file closing
