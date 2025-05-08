@@ -39,9 +39,14 @@ import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class Main extends JFrame {
 
@@ -49,23 +54,7 @@ public class Main extends JFrame {
 	private JPanel contentPane;
 	private DataBase database;
 	File selectedfile ;//TODO
-	final class imgpanel extends JPanel{
-		Image img;
-		protected void paintComponent(Graphics g) {
-	            super.paintComponent(g);
-	            g.setPaintMode();
-	        if (img != null) {
-	            Graphics2D g2d = (Graphics2D) g.create();
-	            int x = (getWidth() - img.getWidth(null)) / 2;
-	            int y = (getHeight() - img.getHeight(null)) / 2;
-	            g2d.drawImage(img, x, y, this);
-	            g2d.dispose();
-	        }
-	    }
-		void setimg(Image imgx){
-			img=imgx;
-		}
-	}
+	
 	static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
@@ -123,42 +112,7 @@ public class Main extends JFrame {
 		JList<FileListDataModel> list = new JList<FileListDataModel>(filelistmodel);
 		imgpanel mainImage = new imgpanel();
 		list.addListSelectionListener(e -> {
-			selectedfile = filelistmodel.getElementAt(list.getSelectedIndex(),true);
-			scrollPane_1.setViewportView(super_list_1.get(list.getSelectedIndex()));
-			if(selectedfile.getName().endsWith(".jpg") || selectedfile.getName().endsWith(".png")){
-			Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(selectedfile.getAbsolutePath());
-			Image bufImage = HighGui.toBufferedImage(image_tmp);
-			//TODO
-			mainImage.setimg(bufImage);
-			this.contentPane.add(mainImage, BorderLayout.CENTER);
-			/*mainImage.setIcon((new ImageIcon(bufImage
-					.getScaledInstance(mainImage.getBounds().width+1,mainImage.getBounds().height+1,Image.SCALE_SMOOTH)
-					)));
-			*/
-			mainImage.addComponentListener(new ComponentListener() {
-			public void componentResized(ComponentEvent e) {
-				int scalex=10 ,scaley=10;
-				if(mainImage.getWidth()>mainImage.getHeight()){
-					scalex=mainImage.getHeight()*(bufImage.getWidth(null)/bufImage.getHeight(null));
-					scaley=mainImage.getHeight();
-				}else {
-					scalex=mainImage.getHeight()*(bufImage.getWidth(null)/bufImage.getHeight(null));
-					scaley=mainImage.getHeight();
-				}
-				mainImage.imageUpdate(bufImage
-						.getScaledInstance(scalex,scaley,Image.SCALE_SMOOTH), ALLBITS, EXIT_ON_CLOSE, ABORT, WIDTH, HEIGHT);
-				mainImage.repaint();
-				/*mainImage.paint(bufImage
-					.getScaledInstance(scalex,scaley,Image.SCALE_SMOOTH)
-				);*/
-			}
-				public void componentMoved(ComponentEvent e) {}
-				public void componentShown(ComponentEvent e) {}
-				public void componentHidden(ComponentEvent e) {}
-			});
-			
-			}
-			System.gc();
+			LeftPanelList.listListener(selectedfile,filelistmodel,list,scrollPane_1,super_list_1,mainImage,this.contentPane);
 		});
 		scrollPane.setViewportView(list);
 		
@@ -198,155 +152,12 @@ public class Main extends JFrame {
 		
 		//IMPORTANT because of the lambda expression, local variable outside can not be changed because of scope conflict
 		mntmOpen.addActionListener(e ->{
-			//Opens the file chooser provided by swing
-			JFileChooser xfile_chooser= new JFileChooser();
-			int response =xfile_chooser.showOpenDialog(null);
-			
-			File file=null;
-			
-			if(response == JFileChooser.APPROVE_OPTION) {
-				try{
-					//file selected -> get path -> try to pull string until EOF(\\Z)
-					file = new File(xfile_chooser.getSelectedFile().getAbsolutePath());
-					/*try {
-						//TODO: Parse file, prints out file for debug purposes
-						String xfile_content = new Scanner(file).useDelimiter("\\Z").next();
-						System.out.printf("%s\n",xfile_content);
-					} catch (FileNotFoundException e1) {
-						// TODO: Close file; handle error
-						e1.printStackTrace();
-					}*/
-				}finally{
-					if (file != null) {
-						/*//TODO: handle file closing
-						try {
-							//TODO: close file
-						}catch (IOException e2) {
-							// This is unrecoverable. Just report it and move on
-						e2.printStackTrace();
-						}
-						*/
-					}
-				}
-				//filelistmodel.addfile(file);
-				//TODO: Big 
-				filelistmodel.addElement(filelistmodel.addfile(file));
-				
-				super_list_1.addLast(new JList<DefaultListModel>());
-				
-				List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
-				
-				projlistmodel.addLast(new DefaultListModel<Object>());
-				projlistmodel.getLast().add(0,file.getName());
-				super_list_1.getLast().setModel(projlistmodel.getLast());
-				
-			}
+			FileChooserUI.open(filelistmodel, super_list_1);
 		});
 		JMenuItem mntmNewDB = new JMenuItem("New DataBase");
 		mnFile.add(mntmNewDB);
 		mntmNewDB.addActionListener(e ->{
-			//TODO initializes new database 
-			//JFrame newdbframe = new JFrame ("MyPanel");
-			JDialog newdbframe = new JDialog(this, "Create a new database", JDialog.ModalityType.DOCUMENT_MODAL);
-			//newdbframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			newdbframe.setBounds(100, 100, 450, 300);
-			JPanel dbPane = new JPanel();
-			
-			dbPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-			
-			GridBagLayout gbl_dbPane = new GridBagLayout();
-			gbl_dbPane.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0};
-			gbl_dbPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
-			gbl_dbPane.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-			gbl_dbPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-			dbPane.setLayout(gbl_dbPane);
-			
-			JLabel lblNewDatabaseName = new JLabel("New DataBase name:");
-			GridBagConstraints gbc_lblNewDatabaseName = new GridBagConstraints();
-			gbc_lblNewDatabaseName.anchor = GridBagConstraints.EAST;
-			gbc_lblNewDatabaseName.insets = new Insets(0, 0, 5, 5);
-			gbc_lblNewDatabaseName.gridx = 3;
-			gbc_lblNewDatabaseName.gridy = 2;
-			dbPane.add(lblNewDatabaseName, gbc_lblNewDatabaseName);
-			
-			JTextField textField = new JTextField();
-			GridBagConstraints gbc_textField = new GridBagConstraints();
-			gbc_textField.insets = new Insets(0, 0, 5, 5);
-			gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-			gbc_textField.gridx = 4;
-			gbc_textField.gridy = 2;
-			dbPane.add(textField, gbc_textField);
-			textField.setColumns(10);
-			
-			JButton btnCreate = new JButton("Create");
-			GridBagConstraints gbc_btnCreate = new GridBagConstraints();
-			gbc_btnCreate.insets = new Insets(0, 0, 5, 0);
-			gbc_btnCreate.gridx = 5;
-			gbc_btnCreate.gridy = 2;
-			dbPane.add(btnCreate, gbc_btnCreate);
-			//
-			btnCreate.addActionListener(btn ->{
-				try {
-					File file = DataBase.makeDB(textField.getText());
-					int j = 0;
-					//TODO BAD CODE
-					for(int i =0;DataBase.tableObj.get(i).file!=file && i <100;i++){
-						j++;
-					}
-					//DataBase.tableObj.get(j).Write("asdf \n");
-					
-					filelistmodel.addElement(filelistmodel.addfile(file));
-					
-					super_list_1.addLast(new JList<DefaultListModel>());
-					
-					List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
-					
-					projlistmodel.addLast(new DefaultListModel<Object>());
-					projlistmodel.getLast().add(0,file.getName());
-					super_list_1.getLast().setModel(projlistmodel.getLast());
-				} catch (IOException e1) {
-					// TODO:
-					e1.printStackTrace();
-				}
-
-			});
-			
-			JRadioButton rdbtnNewRadioButton = new JRadioButton("image");
-			GridBagConstraints gbc_rdbtnNewRadioButton = new GridBagConstraints();
-			gbc_rdbtnNewRadioButton.insets = new Insets(0, 0, 5, 5);
-			gbc_rdbtnNewRadioButton.gridx = 4;
-			gbc_rdbtnNewRadioButton.gridy = 3;
-			dbPane.add(rdbtnNewRadioButton, gbc_rdbtnNewRadioButton);
-			
-			JButton btnCancel = new JButton("Cancel");
-			GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-			gbc_btnCancel.insets = new Insets(0, 0, 5, 0);
-			gbc_btnCancel.gridx = 5;
-			gbc_btnCancel.gridy = 3;
-			dbPane.add(btnCancel, gbc_btnCancel);
-			
-			JRadioButton rdbtnFunction = new JRadioButton("function");
-			GridBagConstraints gbc_rdbtnFunction = new GridBagConstraints();
-			gbc_rdbtnFunction.insets = new Insets(0, 0, 5, 5);
-			gbc_rdbtnFunction.gridx = 4;
-			gbc_rdbtnFunction.gridy = 4;
-			dbPane.add(rdbtnFunction, gbc_rdbtnFunction);
-			
-			JRadioButton rdbtnProject = new JRadioButton("project");
-			GridBagConstraints gbc_rdbtnProject = new GridBagConstraints();
-			gbc_rdbtnProject.insets = new Insets(0, 0, 0, 5);
-			gbc_rdbtnProject.gridx = 4;
-			gbc_rdbtnProject.gridy = 5;
-			dbPane.add(rdbtnProject, gbc_rdbtnProject);
-			
-			/*
-			dbPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-			//text editor for fields
-			JEditorPane editorPane = new javax.swing.JEditorPane();
-			dbPane.add(editorPane, BorderLayout.SOUTH);
-			*/
-			newdbframe.setContentPane(dbPane);
-			newdbframe.setVisible(true);
+			DataBaseOpenUI.open(this,filelistmodel, super_list_1,this.contentPane);
 		});
 		
 		JMenu mnEdit = new JMenu("Edit");
@@ -365,7 +176,69 @@ public class Main extends JFrame {
 		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Light");
 		mnTheme.add(mntmNewMenuItem_2);
 		
-		
+		mntmNewMenuItem.addActionListener(e -> {
+			this.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		    this.setMediumTheme();
+		});
+
+		mntmNewMenuItem_2.addActionListener(e -> {
+			this.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			this.setLightTheme();
+		});
+
+		mntmNewMenuItem_1.addActionListener(e -> {
+		    this.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+		    this.setDarkTheme();
+		});
+
+		// Method to change LookAndFeel
+	}
+	
+	private void setLookAndFeel(String lookAndFeel) {
+	    try {
+	        UIManager.setLookAndFeel(lookAndFeel);
+	        SwingUtilities.updateComponentTreeUI(this); // Update the UI with the new LookAndFeel
+	    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	// Medium theme: #1c6362
+	private void setMediumTheme() {
+
+	    this.contentPane.setBackground(new java.awt.Color(0x1c, 0x63, 0x62));
+	    this.contentPane.setForeground(java.awt.Color.WHITE);
+	    for(Component comp :this.contentPane.getComponents()){
+	    	comp.setBackground(new java.awt.Color(0x1c, 0x63, 0x62));
+	    	comp.setForeground(java.awt.Color.WHITE);
+	    }
+
+	}
+
+	// Dark theme: #242226
+	private void setLightTheme() {
+
+	    
+	    this.contentPane.setBackground(new java.awt.Color(0x82, 0xb8, 0xb7));
+	    this.contentPane.setForeground(java.awt.Color.BLACK);
+	    for(Component comp :this.contentPane.getComponents()){
+	    	comp.setBackground(new java.awt.Color(0x82, 0xb8, 0xb7));
+	    	comp.setForeground(java.awt.Color.BLACK);
+	    }
+	    
+
+	}
+
+	// Light theme: #82b8b7
+	private void setDarkTheme() {
+
+	    this.contentPane.setBackground(new java.awt.Color(0x42, 0x45, 0x45));
+	    this.contentPane.setForeground(java.awt.Color.WHITE);
+	    for(Component comp :this.contentPane.getComponents()){
+	    	comp.setBackground(new java.awt.Color(0x42, 0x45, 0x45));
+	    	comp.setForeground(java.awt.Color.WHITE);
+	    }
+
 	}
 
 }
