@@ -18,6 +18,7 @@ import java.util.Scanner;
 
 
 import javax.swing.SwingUtilities;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -111,6 +112,45 @@ public class Main extends JFrame {
 
 		JScrollPane scrollPane3 = new JScrollPane();  // Yeni nesne!
 		tabbedPane_2.addTab("Functions", null, scrollPane3, null);
+		
+		// Fonksiyonlar için panel oluşturuyoruz
+    	JPanel functionPanel = new JPanel();
+    	functionPanel.setLayout(new BoxLayout(functionPanel, BoxLayout.Y_AXIS));
+    	scrollPane3.setViewportView(functionPanel);
+    
+    	// Başlık butonları (Color ve Shape başlıkları)
+    	JButton colorButton = new JButton("Color");
+    	colorButton.addActionListener(e -> {
+        	// Fonksiyon butonları 
+        	functionPanel.removeAll();  // Önceki butonları temizle
+        	JButton filterButton = new JButton("Apply Color Filter");
+        	filterButton.addActionListener(evt -> applyColorFilter());
+        	functionPanel.add(filterButton);
+        	functionPanel.revalidate();
+        	functionPanel.repaint();
+    	});
+    
+    	JButton shapeButton = new JButton("Shape");
+    	shapeButton.addActionListener(e -> {
+        	// Şekil filtresi ile ilgili butonları ekle
+        	functionPanel.removeAll();  // Önceki butonları temizle
+        	JButton shapeFilterButton = new JButton("Apply Shape Filter");
+        	shapeFilterButton.addActionListener(evt -> applyShapeFilter());
+        	functionPanel.add(shapeFilterButton);
+        	functionPanel.revalidate();
+        	functionPanel.repaint();
+    	});
+    
+    	// Func type başlığına butonları ekleyelim
+    	JPanel funcTypePanel = new JPanel();
+    	funcTypePanel.setLayout(new BoxLayout(funcTypePanel, BoxLayout.Y_AXIS));
+    	funcTypePanel.add(colorButton);
+    	funcTypePanel.add(shapeButton);
+    	scrollPane2.setViewportView(funcTypePanel);
+
+
+		
+
 
 		
 		//projlistmodel is changed to be created at file opening
@@ -364,21 +404,21 @@ public class Main extends JFrame {
 	private void applyTheme(String theme) {
 	Color background, foreground;
 
-	switch (theme.toLowerCase()) {
-		case "dark":
-			background = new Color(45, 45, 45);
-			foreground = new Color(220, 220, 220);
-			break;
-		case "medium":
-			background = new Color(100, 100, 100);
-			foreground = new Color(240, 240, 240);
-			break;
-		case "light":
-		default:
-			background = Color.WHITE;
-			foreground = Color.BLACK;
-			break;
-	}
+		switch (theme.toLowerCase()) {
+			case "dark":
+				background = new Color(45, 45, 45);
+				foreground = new Color(220, 220, 220);
+				break;
+			case "medium":
+				background = new Color(100, 100, 100);
+				foreground = new Color(240, 240, 240);
+				break;
+			case "light":
+			default:
+				background = Color.WHITE;
+				foreground = Color.BLACK;
+				break;
+		}
 
 	UIManager.put("Panel.background", background);
 	UIManager.put("Label.foreground", foreground);
@@ -406,6 +446,18 @@ public class Main extends JFrame {
             	updateComponentColors((JPanel) comp, foreground, background);
         	}
     	}
+	}
+
+	private void applyColorFilter() {
+    // Renk filtresi fonksiyonu
+    	System.out.println("Applying color filter...");
+    // Burada istediğiniz işlemi yapabilirsiniz
+	}
+
+	private void applyShapeFilter() {
+    // Shape filtresi fonksiyonu
+    	System.out.println("Applying shape filter...");
+    // Burada istediğiniz işlemi yapabilirsiniz
 	}
 
 
