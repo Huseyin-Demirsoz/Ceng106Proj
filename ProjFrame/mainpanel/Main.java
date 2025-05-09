@@ -1,5 +1,8 @@
 package mainpanel;
 
+
+import java.awt.Color;
+import javax.swing.UIManager;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+
+import javax.swing.SwingUtilities;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -45,7 +50,7 @@ import javax.swing.event.ListSelectionEvent;
 import mainpanel.FileListDataModel;
 import mainpanel.DataBase;
 
-import org.opencv.*;
+//import org.opencv.*;
 
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
@@ -78,7 +83,7 @@ public class Main extends JFrame {
 		//since the public class inherits from the JFrame, methods can be called on with "this" but it is usually not necessary
 		// Additional this added for clarity
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(100, 100, 800, 500);
+		this.setBounds(500, 300, 1300, 800);
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
@@ -95,6 +100,18 @@ public class Main extends JFrame {
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		tabbedPane_1.addTab("Project view", null, scrollPane_1, null);
+
+
+
+		JTabbedPane tabbedPane_2 = new JTabbedPane(JTabbedPane.TOP);
+		this.contentPane.add(tabbedPane_2, BorderLayout.EAST);
+
+		JScrollPane scrollPane2 = new JScrollPane();  // Yeni nesne!
+		tabbedPane_2.addTab("Func type", null, scrollPane2, null);
+
+		JScrollPane scrollPane3 = new JScrollPane();  // Yeni nesne!
+		tabbedPane_2.addTab("Functions", null, scrollPane3, null);
+
 		
 		//projlistmodel is changed to be created at file opening
 		
@@ -304,7 +321,7 @@ public class Main extends JFrame {
 			newdbframe.setContentPane(dbPane);
 			newdbframe.setVisible(true);
 		});
-		
+		//tema kısmı halloldu galiba
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		mnEdit.setHorizontalAlignment(SwingConstants.LEFT);
@@ -320,8 +337,76 @@ public class Main extends JFrame {
 		
 		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Light");
 		mnTheme.add(mntmNewMenuItem_2);
+
+
+		mntmNewMenuItem_2.addActionListener(e -> {
+    		contentPane.setBackground(Color.WHITE);
+    		updateComponentColors(contentPane, Color.BLACK, Color.WHITE);
+		});
+
+		mntmNewMenuItem_1.addActionListener(e -> {
+    		contentPane.setBackground(Color.DARK_GRAY);
+    		updateComponentColors(contentPane, Color.WHITE, Color.DARK_GRAY);
+		});
+
+
+		mntmNewMenuItem.addActionListener(e -> {
+    		contentPane.setBackground(new Color(200, 200, 200));
+    		updateComponentColors(contentPane, Color.BLACK, new Color(200, 200, 200));
+		});
+
+
 		
+
 		
 	}
+
+	private void applyTheme(String theme) {
+	Color background, foreground;
+
+	switch (theme.toLowerCase()) {
+		case "dark":
+			background = new Color(45, 45, 45);
+			foreground = new Color(220, 220, 220);
+			break;
+		case "medium":
+			background = new Color(100, 100, 100);
+			foreground = new Color(240, 240, 240);
+			break;
+		case "light":
+		default:
+			background = Color.WHITE;
+			foreground = Color.BLACK;
+			break;
+	}
+
+	UIManager.put("Panel.background", background);
+	UIManager.put("Label.foreground", foreground);
+	UIManager.put("Button.background", background);
+	UIManager.put("Button.foreground", foreground);
+	UIManager.put("Menu.background", background);
+	UIManager.put("Menu.foreground", foreground);
+	UIManager.put("MenuItem.background", background);
+	UIManager.put("MenuItem.foreground", foreground);
+	UIManager.put("List.background", background);
+	UIManager.put("List.foreground", foreground);
+	UIManager.put("TextField.background", background);
+	UIManager.put("TextField.foreground", foreground);
+	UIManager.put("TabbedPane.background", background);
+	UIManager.put("TabbedPane.foreground", foreground);
+
+	SwingUtilities.updateComponentTreeUI(this);
+}
+
+	private void updateComponentColors(JPanel panel, Color foreground, Color background) {
+		for (java.awt.Component comp : panel.getComponents()) {
+        	comp.setBackground(background);
+        	comp.setForeground(foreground);
+        	if (comp instanceof JPanel) {
+            	updateComponentColors((JPanel) comp, foreground, background);
+        	}
+    	}
+	}
+
 
 }
