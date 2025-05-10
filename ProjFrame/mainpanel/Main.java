@@ -85,6 +85,7 @@ public class Main extends JFrame {
 	The main function dispatches the public constructor as a main thread
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -105,7 +106,8 @@ public class Main extends JFrame {
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		database = new ImgDataBase();
-		
+		//TODO DEBUG
+		database.Parse("/home/hd/Desktop/projtestfile.txt");
 		this.setContentPane(contentPane);
 		BorderLayout mainborder= new BorderLayout();
 		mainborder.setHgap(8);

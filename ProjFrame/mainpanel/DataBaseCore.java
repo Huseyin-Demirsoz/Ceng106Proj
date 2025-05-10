@@ -10,7 +10,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.stream.Collectors;
+
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 
 public abstract class DataBaseCore {   // Dosya oluşturur veya siler
@@ -104,7 +109,123 @@ public abstract class DataBaseCore {   // Dosya oluşturur veya siler
 
         return dosAdi;
     }
-	public void Parse(){
+	public void Parse(String path){
+		String reader;
+		
+		try {
+			reader = new Scanner(new File(path)).useDelimiter("\\Z").next();
+			//int current;
+			Stack<String> progstack = new Stack<>();
+			enum state{
+				CODE,COMMENT
+			} 
+			state status=state.CODE;
+			for(int i =0; i<reader.length()-1;i++){
+				switch(status) {
+					case CODE:
+						switch(reader.charAt(i)) {
+							case '/':
+								//checks for comment block opening
+								if(reader.charAt(i+1)=='*'){
+									status=state.COMMENT;
+									i++;
+									break;
+								}
+							break;
+							case '#':{
+								//for pushing images onto the stack for functions
+								//this is in the form of:
+								//# "IMGPATH"
+								//Farklı versyonları vardır
+								// quotation version
+								i++;
+								int start=i,stop=i;
+								while(reader.charAt(start)!='"') {
+									//For dropping white space before path
+									start++;
+									i++;
+									if(reader.charAt(i)=='\n') {
+										//TODO erroneous code found -> bad image path -> exited without giving path
+										System.out.println("ERROR");
+										break;
+									}
+								}
+								start++;
+								stop = start;
+								while(reader.charAt(stop)!='"') {
+									stop++;
+									i++;
+									if(reader.charAt(i)=='\n') {
+										//TODO erroneous code found -> bad image path -> exited without giving path
+										System.out.println("ERROR");
+										break;
+									}
+								}
+								progstack.push(reader.substring(start, stop));
+							}break;
+							case '%':{
+								//% denotes functions in the form of 
+								//% "function name"
+								i++;
+								int start=i,stop=i;
+								while(reader.charAt(start)!='"') {
+									//For dropping white space before path
+									start++;
+									i++;
+									if(reader.charAt(i)=='\n') {
+										//TODO erroneous code found -> bad image path -> exited without giving path
+										System.out.println("ERROR");
+										break;
+									}
+								}
+								start++;
+								stop = start;
+								while(reader.charAt(stop)!='"') {
+									stop++;
+									i++;
+									if(reader.charAt(i)=='\n') {
+										//TODO erroneous code found -> bad image path -> exited without giving path
+										System.out.println("ERROR");
+										break;
+									}
+								}
+								switch (reader.substring(start, stop)){
+									case "ToGrayScale":
+										Mat dest = new Mat();
+										Imgproc.cvtColor(Imgcodecs.imread(progstack.pop()), dest, Imgproc.COLOR_RGB2GRAY);
+										Imgcodecs.imwrite(progstack.pop(), dest);
+										break;
+								}
+							}break;
+						}
+						break;
+					case COMMENT:
+						if(reader.charAt(i)=='*'){
+							if(reader.charAt(i+1)=='/'){
+								status=state.CODE;
+								i++;
+								//System.out.append('\n');
+								break;
+							}
+						}
+						//System.out.append(reader.charAt(i));
+						break;
+				default:
+					break;
+				}
+				
+			}
+			while(!progstack.empty()) {
+				System.out.println( progstack.pop());
+			}
+			
+			reader =null;
+			System.gc();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		/*
 		Scanner reader;
