@@ -9,7 +9,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 
 public class FileChooserUI {
-	public static void open(FileListDataModel filelistmodel, List<JList<DefaultListModel>> super_list_1){
+	public static void open(FileListDataModel filelistmodel, List<JList<FileListDataModel>> super_list_1){
 		//Opens the file chooser provided by swing
 		JFileChooser xfile_chooser= new JFileChooser();
 		int response =xfile_chooser.showOpenDialog(null);
@@ -44,15 +44,15 @@ public class FileChooserUI {
 			//TODO: Big 
 			filelistmodel.addElement(filelistmodel.addfile(file));
 			
-			super_list_1.addLast(new JList<DefaultListModel>());
+			super_list_1.addLast(new JList<FileListDataModel>());
 			
 			List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
 			
 			projlistmodel.addLast(new DefaultListModel<Object>());
 			projlistmodel.getLast().add(0,file.getName());
 			super_list_1.getLast().setModel(projlistmodel.getLast());
-			projlistmodel=null;
-			System.gc();
+			//projlistmodel=null;
+			//System.gc();
 			
 		}
 	}

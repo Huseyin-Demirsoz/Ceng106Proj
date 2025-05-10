@@ -1,5 +1,8 @@
 package mainpanel;
 
+
+import java.awt.Color;
+import javax.swing.UIManager;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,12 +13,17 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.SwingUtilities;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
@@ -28,6 +36,21 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+
+import mainpanel.FileListDataModel;
+import mainpanel.DataBaseCore;
 import javax.swing.ImageIcon;
 
 import java.awt.event.ComponentEvent;
@@ -52,7 +75,7 @@ public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private DataBase database;
+	private ImgDataBase database;
 	File selectedfile ;//TODO
 	
 	static {
@@ -81,7 +104,7 @@ public class Main extends JFrame {
 		this.setBounds(100, 100, 800, 500);
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		database = new DataBase();
+		database = new ImgDataBase();
 		
 		this.setContentPane(contentPane);
 		BorderLayout mainborder= new BorderLayout();
@@ -97,6 +120,18 @@ public class Main extends JFrame {
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		tabbedPane_1.addTab("Project view", null, scrollPane_1, null);
+
+
+
+		JTabbedPane tabbedPane_2 = new JTabbedPane(JTabbedPane.TOP);
+		this.contentPane.add(tabbedPane_2, BorderLayout.EAST);
+
+		JScrollPane scrollPane2 = new JScrollPane();  // Yeni nesne!
+		tabbedPane_2.addTab("Func type", null, scrollPane2, null);
+
+		JScrollPane scrollPane3 = new JScrollPane();  // Yeni nesne!
+		tabbedPane_2.addTab("Functions", null, scrollPane3, null);
+
 		
 		//projlistmodel is changed to be created at file opening
 		
@@ -105,7 +140,7 @@ public class Main extends JFrame {
 		//super_list_1 is the list of the "list elements" that get displayed 
 		//for each file for example the functions and image path contained in a database
 		
-		List<JList<DefaultListModel>> super_list_1 = new ArrayList<JList<DefaultListModel>>();
+		List<JList<FileListDataModel>> super_list_1 = new ArrayList<JList<FileListDataModel>>();
 		
 		//sets the JList in the project view tab to the contents of the selected file
 		FileListDataModel filelistmodel = new FileListDataModel();
@@ -117,17 +152,17 @@ public class Main extends JFrame {
 		scrollPane.setViewportView(list);
 		
 		//input klasöründeki tüm dosyaları listeye almak için
-		DataBase.makeDB();
-		DataBase.readDBfromFolder();
-		for(int i =0;i<DataBase.tableObj.size();i++){
-			filelistmodel.addElement(filelistmodel.addfile(DataBase.tableObj.get(i).file));
+		database.makeDB();
+		database.readDBfromFolder();
+		for(int i =0;i<database.tableObj.size();i++){
+			filelistmodel.addElement(filelistmodel.addfile(database.tableObj.get(i).file));
 			
-			super_list_1.addLast(new JList<DefaultListModel>());
+			super_list_1.addLast(new JList<FileListDataModel>());
 			
 			List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
 			
 			projlistmodel.addLast(new DefaultListModel<Object>());
-			projlistmodel.getLast().add(0,DataBase.tableObj.get(i).file.getName());
+			projlistmodel.getLast().add(0,database.tableObj.get(i).file.getName());
 			super_list_1.getLast().setModel(projlistmodel.getLast());
 		}
 		
@@ -157,9 +192,9 @@ public class Main extends JFrame {
 		JMenuItem mntmNewDB = new JMenuItem("New DataBase");
 		mnFile.add(mntmNewDB);
 		mntmNewDB.addActionListener(e ->{
-			DataBaseOpenUI.open(this,filelistmodel, super_list_1,this.contentPane);
+			DataBaseOpenUI.open(this, database, filelistmodel, super_list_1, this.contentPane);
 		});
-		
+		//tema kısmı halloldu galiba
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		mnEdit.setHorizontalAlignment(SwingConstants.LEFT);
@@ -175,7 +210,7 @@ public class Main extends JFrame {
 		
 		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Light");
 		mnTheme.add(mntmNewMenuItem_2);
-		
+		/*
 		mntmNewMenuItem.addActionListener(e -> {
 			this.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 		    this.setMediumTheme();
@@ -240,5 +275,77 @@ public class Main extends JFrame {
 	    }
 
 	}
+
+}
+*/
+		mntmNewMenuItem_2.addActionListener(e -> {
+    		contentPane.setBackground(Color.WHITE);
+    		updateComponentColors(contentPane, Color.BLACK, Color.WHITE);
+		});
+
+		mntmNewMenuItem_1.addActionListener(e -> {
+    		contentPane.setBackground(Color.DARK_GRAY);
+    		updateComponentColors(contentPane, Color.WHITE, Color.DARK_GRAY);
+		});
+
+
+		mntmNewMenuItem.addActionListener(e -> {
+    		contentPane.setBackground(new Color(200, 200, 200));
+    		updateComponentColors(contentPane, Color.BLACK, new Color(200, 200, 200));
+		});
+
+
+		
+
+		
+	}
+
+	private void applyTheme(String theme) {
+	Color background, foreground;
+
+	switch (theme.toLowerCase()) {
+		case "dark":
+			background = new Color(45, 45, 45);
+			foreground = new Color(220, 220, 220);
+			break;
+		case "medium":
+			background = new Color(100, 100, 100);
+			foreground = new Color(240, 240, 240);
+			break;
+		case "light":
+		default:
+			background = Color.WHITE;
+			foreground = Color.BLACK;
+			break;
+	}
+
+	UIManager.put("Panel.background", background);
+	UIManager.put("Label.foreground", foreground);
+	UIManager.put("Button.background", background);
+	UIManager.put("Button.foreground", foreground);
+	UIManager.put("Menu.background", background);
+	UIManager.put("Menu.foreground", foreground);
+	UIManager.put("MenuItem.background", background);
+	UIManager.put("MenuItem.foreground", foreground);
+	UIManager.put("List.background", background);
+	UIManager.put("List.foreground", foreground);
+	UIManager.put("TextField.background", background);
+	UIManager.put("TextField.foreground", foreground);
+	UIManager.put("TabbedPane.background", background);
+	UIManager.put("TabbedPane.foreground", foreground);
+
+	SwingUtilities.updateComponentTreeUI(this);
+}
+
+	private void updateComponentColors(JPanel panel, Color foreground, Color background) {
+		for (java.awt.Component comp : panel.getComponents()) {
+        	comp.setBackground(background);
+        	comp.setForeground(foreground);
+        	if (comp instanceof JPanel) {
+            	updateComponentColors((JPanel) comp, foreground, background);
+        	}
+    	}
+	}
+
 
 }

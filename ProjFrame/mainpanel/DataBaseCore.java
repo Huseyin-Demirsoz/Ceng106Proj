@@ -1,5 +1,8 @@
 package mainpanel;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,18 +13,18 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 
-public class DataBase implements DB_methods{   // Dosya oluşturur veya siler
+public abstract class DataBaseCore {   // Dosya oluşturur veya siler
 
-    public static ArrayList<Table> tableObj; // Referans dizisi de olabilir.
+    public ArrayList<Table> tableObj; // Referans dizisi de olabilir.
     
-    public static void makeDB() {
+    public void makeDB() {
     	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
     		new File("input").mkdirs();
     		new File("output").mkdirs();
     	}
     	tableObj = new ArrayList<>();
     }
-    public static File makeDB(String nameofdb) throws IOException {
+    public File makeDB(String nameofdb)  {
     	/*
         //Table_name kullanıcıdan okunabilir
          String file_name = get_Tablename();
@@ -61,7 +64,7 @@ public class DataBase implements DB_methods{   // Dosya oluşturur veya siler
         
         return file;
     }
-    public static void readDBfromFolder(/*get path?*/) {
+    public void readDBfromFolder(/*get path?*/) {
     	//programımız ilk başladığında input klasörünün içindeki tüm dosyaları okuması için
     	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
     		new File("input").mkdirs();
@@ -82,7 +85,7 @@ public class DataBase implements DB_methods{   // Dosya oluşturur veya siler
 		}
     	
     }
-    public static void deleteDB(Table tb){
+    public void deleteDB(Table tb){
 
         tb = null;
         System.gc();
@@ -91,7 +94,7 @@ public class DataBase implements DB_methods{   // Dosya oluşturur veya siler
 
     }
 
-    public static  String get_Tablename(){
+    public  String get_Tablename(){
 
         Scanner input = new Scanner(System.in);
 
@@ -100,7 +103,38 @@ public class DataBase implements DB_methods{   // Dosya oluşturur veya siler
         String dosAdi = input.nextLine();
 
         return dosAdi;
-
-
     }
+	public void Parse(){
+		
+		/*
+		Scanner reader;
+		try {
+			reader = new Scanner(tableObj.get(0).file).useDelimiter("\\S");
+			String current;
+			enum state{
+				CODE,COMMENT
+			} 
+			state status=state.CODE;
+			while(reader.hasNext()) {
+				current = reader.next();
+				if(current=="/") {
+					if(reader.) {
+						reader.skip("\\*\\/");
+					}
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+	}
 }
+class ImgDataBase extends DataBaseCore{
+	
+}
+

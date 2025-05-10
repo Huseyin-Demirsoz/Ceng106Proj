@@ -16,10 +16,11 @@ import org.opencv.highgui.HighGui;
 
 public class LeftPanelList {
 	public static void listListener(File selectedfile,FileListDataModel filelistmodel,JList<FileListDataModel> list,
-			JScrollPane scrollPane_1,List<JList<DefaultListModel>> super_list_1,imgpanel mainImage,JPanel contentPane
+			JScrollPane scrollPane_1,List<JList<FileListDataModel>> super_list_1,imgpanel mainImage,JPanel contentPane
 			) {
 		selectedfile = filelistmodel.getElementAt(list.getSelectedIndex(),true);
 		scrollPane_1.setViewportView(super_list_1.get(list.getSelectedIndex()));
+		
 		if(selectedfile.getName().endsWith(".jpg") || selectedfile.getName().endsWith(".png")){
 		Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(selectedfile.getAbsolutePath());
 		Image bufImage = HighGui.toBufferedImage(image_tmp);

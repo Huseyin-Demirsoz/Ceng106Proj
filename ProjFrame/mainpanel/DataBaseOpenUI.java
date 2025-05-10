@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 public class DataBaseOpenUI {
-	public static void open(JFrame mainf,FileListDataModel filelistmodel, List<JList<DefaultListModel>> super_list_1,JPanel contentPane) {
+	public static void open(JFrame mainf,ImgDataBase database,FileListDataModel filelistmodel, List<JList<FileListDataModel>> super_list_1,JPanel contentPane) {
 		//TODO initializes new database 
 		//JFrame newdbframe = new JFrame ("MyPanel");
 		JDialog newdbframe = new JDialog(mainf, "Create a new database", JDialog.ModalityType.DOCUMENT_MODAL);
@@ -63,29 +63,23 @@ public class DataBaseOpenUI {
 		dbPane.add(btnCreate, gbc_btnCreate);
 		//
 		btnCreate.addActionListener(btn ->{
-			try {
-				File file = DataBase.makeDB(textField.getText());
-				int j = 0;
-				//TODO BAD CODE
-				for(int i =0;DataBase.tableObj.get(i).file!=file && i <100;i++){
-					j++;
-				}
-				//DataBase.tableObj.get(j).Write("asdf \n");
-				
-				filelistmodel.addElement(filelistmodel.addfile(file));
-				
-				super_list_1.addLast(new JList<DefaultListModel>());
-				
-				List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
-				
-				projlistmodel.addLast(new DefaultListModel<Object>());
-				projlistmodel.getLast().add(0,file.getName());
-				super_list_1.getLast().setModel(projlistmodel.getLast());
-			} catch (IOException e1) {
-				// TODO:
-				e1.printStackTrace();
+			File file = database.makeDB(textField.getText());
+			int j = 0;
+			// TODO BAD CODE
+			for (int i = 0; database.tableObj.get(i).file != file && i < 100; i++) {
+				j++;
 			}
+			// DataBase.tableObj.get(j).Write("asdf \n");
 
+			filelistmodel.addElement(filelistmodel.addfile(file));
+
+			super_list_1.addLast(new JList<FileListDataModel>());
+
+			List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
+
+			projlistmodel.addLast(new DefaultListModel<Object>());
+			projlistmodel.getLast().add(0, file.getName());
+			super_list_1.getLast().setModel(projlistmodel.getLast());
 		});
 		
 		JRadioButton rdbtnNewRadioButton = new JRadioButton("image");
