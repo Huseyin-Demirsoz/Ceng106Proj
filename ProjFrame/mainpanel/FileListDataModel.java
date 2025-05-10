@@ -16,9 +16,6 @@ public class FileListDataModel extends DefaultListModel {
 	public Object getElementAt(int index) {
 		return files.get(index).getName();
 	}
-	public File getElementAt(int index,Boolean tr) {
-		return files.get(index);
-	}
 	
 	public String addfile(File filecurr) {
 		if(this.files==null) {
