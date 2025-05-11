@@ -132,23 +132,23 @@ public class Main extends JFrame {
 
     		JButton medianBlurButton = new JButton("Apply Median Blur");
     		medianBlurButton.addActionListener(evt -> 
-        	applyMedianBlur("resources/images/image1.jpg", "output/image1.jpg")
-    	);
+        		applyMedianBlur("resources/images/image1.jpg", "output/image1.jpg")
+    		);
 
     		JButton cannyButton = new JButton("Apply Canny Edge Detection");
     		cannyButton.addActionListener(evt -> 
-        	applyCanny("resources/images/image2.jpg", "output/image2.jpg")
-    	);
+        		applyCanny("resources/images/image2.jpg", "output/image2.jpg")
+    		);
 
     		JButton brightnessContrastButton = new JButton("Adjust Brightness & Contrast");
     		brightnessContrastButton.addActionListener(evt -> 
-        	adjustBrightnessContrast("resources/images/image4.jpg", "output/image4.jpg", 1.5, 50)
-    	);
+        		adjustBrightnessContrast("resources/images/image4.jpg", "output/image4.jpg", 1.5, 50)
+    		);
 
     		JButton kMeansButton = new JButton("Apply K-Means Color Clustering");
    			kMeansButton.addActionListener(evt -> 
-        	applyDominantColorKMeans("resources/images/image3.jpg", "output/image3.jpg", 5)
-    	);
+        		applyDominantColorKMeans("resources/images/image3.jpg", "output/image3.jpg", 5)
+    		);
 
     // Butonları panele ekle
     		functionPanel.add(medianBlurButton);
@@ -158,7 +158,7 @@ public class Main extends JFrame {
 
     		functionPanel.revalidate();
     		functionPanel.repaint();
-	});
+		});
 
     
     	JButton shapeButton = new JButton("Shape");
