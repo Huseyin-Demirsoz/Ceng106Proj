@@ -38,6 +38,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.w3c.dom.css.Rect;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -51,7 +53,12 @@ import javax.swing.event.ListSelectionEvent;
 import mainpanel.FileListDataModel;
 import mainpanel.DataBase;
 
-//import org.opencv.*;
+
+//bu yorum satırı olmicak 
+/*import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+*/
 
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
@@ -121,14 +128,38 @@ public class Main extends JFrame {
     	// Başlık butonları (Color ve Shape başlıkları)
     	JButton colorButton = new JButton("Color");
     	colorButton.addActionListener(e -> {
-        	// Fonksiyon butonları 
-        	functionPanel.removeAll();  // Önceki butonları temizle
-        	JButton filterButton = new JButton("Apply Color Filter");
-        	filterButton.addActionListener(evt -> applyColorFilter());
-        	functionPanel.add(filterButton);
-        	functionPanel.revalidate();
-        	functionPanel.repaint();
-    	});
+    		functionPanel.removeAll();  // Önceki butonları temizle
+
+    		JButton medianBlurButton = new JButton("Apply Median Blur");
+    		medianBlurButton.addActionListener(evt -> 
+        	applyMedianBlur("resources/images/image1.jpg", "output/image1.jpg")
+    	);
+
+    		JButton cannyButton = new JButton("Apply Canny Edge Detection");
+    		cannyButton.addActionListener(evt -> 
+        	applyCanny("resources/images/image2.jpg", "output/image2.jpg")
+    	);
+
+    		JButton brightnessContrastButton = new JButton("Adjust Brightness & Contrast");
+    		brightnessContrastButton.addActionListener(evt -> 
+        	adjustBrightnessContrast("resources/images/image4.jpg", "output/image4.jpg", 1.5, 50)
+    	);
+
+    		JButton kMeansButton = new JButton("Apply K-Means Color Clustering");
+   			kMeansButton.addActionListener(evt -> 
+        	applyDominantColorKMeans("resources/images/image3.jpg", "output/image3.jpg", 5)
+    	);
+
+    // Butonları panele ekle
+    		functionPanel.add(medianBlurButton);
+    		functionPanel.add(cannyButton);
+    		functionPanel.add(brightnessContrastButton);
+    		functionPanel.add(kMeansButton);
+
+    		functionPanel.revalidate();
+    		functionPanel.repaint();
+	});
+
     
     	JButton shapeButton = new JButton("Shape");
     	shapeButton.addActionListener(e -> {
@@ -448,17 +479,72 @@ public class Main extends JFrame {
     	}
 	}
 
-	private void applyColorFilter() {
-    // Renk filtresi fonksiyonu
-    	System.out.println("Applying color filter...");
-    // Burada istediğiniz işlemi yapabilirsiniz
-	}
+	
 
 	private void applyShapeFilter() {
     // Shape filtresi fonksiyonu
     	System.out.println("Applying shape filter...");
     // Burada istediğiniz işlemi yapabilirsiniz
 	}
+
+
+	public static void applyMedianBlur(String inputPath, String outputPath) {/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        Mat dst = new Mat();
+        Imgproc.medianBlur(src, dst, 5);
+        Imgcodecs.imwrite(outputPath, dst);*/
+    }
+
+    public static void applyCanny(String inputPath, String outputPath) {/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        Mat gray = new Mat();
+        Mat edges = new Mat();
+
+        Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.Canny(gray, edges, 100, 200);
+        Imgcodecs.imwrite(outputPath, edges);*/
+    }
+
+    public static void adjustBrightnessContrast(String inputPath, String outputPath, double alpha, double beta) {/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        Mat dst = new Mat();
+        src.convertTo(dst, -1, alpha, beta);
+        Imgcodecs.imwrite(outputPath, dst);*/
+    }
+
+    public static void applyDominantColorKMeans(String inputPath, String outputPath, int k) {/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        Mat reshaped = src.reshape(1, src.cols() * src.rows());
+        Mat reshaped32f = new Mat();
+        reshaped.convertTo(reshaped32f, CvType.CV_32F);
+
+        Mat labels = new Mat();
+        Mat centers = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 10, 1.0);
+
+        Core.kmeans(reshaped32f, k, labels, criteria, 3, Core.KMEANS_PP_CENTERS, centers);
+        centers.convertTo(centers, CvType.CV_8U);
+
+        // Yeni görsel: genişlik = 100*k, yükseklik = 100
+        int boxWidth = 100;
+        int boxHeight = 100;
+        Mat colorBoxes = new Mat(boxHeight, boxWidth * k, CvType.CV_8UC3);
+
+        for (int i = 0; i < k; i++) {
+            byte[] colorBytes = new byte[3];
+            centers.get(i, 0, colorBytes);
+            Scalar scalarColor = new Scalar(
+                    Byte.toUnsignedInt(colorBytes[0]),
+                    Byte.toUnsignedInt(colorBytes[1]),
+                    Byte.toUnsignedInt(colorBytes[2])
+            );
+
+            Rect rect = new Rect(i * boxWidth, 0, boxWidth, boxHeight);
+            Imgproc.rectangle(colorBoxes, rect, scalarColor, -1);
+        }
+
+        Imgcodecs.imwrite(outputPath, colorBoxes);*/
+    }
 
 
 }
