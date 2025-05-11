@@ -107,7 +107,9 @@ public class Main extends JFrame {
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		database = new ImgDataBase();
 		//TODO DEBUG
-		database.Parse("/home/hd/Desktop/projtestfile.txt");
+		FunctionDataBase functions = new FunctionDataBase();
+		functions.Parse("/home/hd/Desktop/projtestfile.txt");// TODO DEBUG file
+		
 		this.setContentPane(contentPane);
 		BorderLayout mainborder= new BorderLayout();
 		mainborder.setHgap(8);
