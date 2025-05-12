@@ -160,6 +160,39 @@ public class Main extends JFrame {
     		functionPanel.repaint();
 		});
 
+		// Başlık butonları (Effect başlığı)
+		JButton effectButton = new JButton("Effect");
+		effectButton.addActionListener(e -> {
+			functionPanel.removeAll();  // Önceki butonları temizle
+
+			// Sketch Effect butonu
+			JButton sketchButton = new JButton("Apply Sketch Effect");
+			sketchButton.addActionListener(evt ->
+				applySketchEffect("resources/images/image1.jpg", "output/sketch.jpg")
+			);
+
+			// Cartoon Prep Effect butonu
+			JButton cartoonButton = new JButton("Apply Cartoon Prep Effect");
+			cartoonButton.addActionListener(evt ->
+				applyCartoonPrepEffect("resources/images/image2.jpg", "output/cartoon.jpg")
+			);
+
+			// Sobel Edge butonu
+			JButton sobelButton = new JButton("Apply Sobel Edge Detection");
+			sobelButton.addActionListener(evt ->
+				applySobelEdge("resources/images/image3.jpg", "output/sobel.jpg")
+			);
+
+			// Butonları panele ekle
+			functionPanel.add(sketchButton);
+			functionPanel.add(cartoonButton);
+			functionPanel.add(sobelButton);
+
+			functionPanel.revalidate();
+			functionPanel.repaint();
+		});
+
+
     
     	JButton shapeButton = new JButton("Shape");
     	shapeButton.addActionListener(e -> {
@@ -177,6 +210,7 @@ public class Main extends JFrame {
     	funcTypePanel.setLayout(new BoxLayout(funcTypePanel, BoxLayout.Y_AXIS));
     	funcTypePanel.add(colorButton);
     	funcTypePanel.add(shapeButton);
+		funcTypePanel.add(effectButton);
     	scrollPane2.setViewportView(funcTypePanel);
 
 
@@ -546,5 +580,84 @@ public class Main extends JFrame {
         Imgcodecs.imwrite(outputPath, colorBoxes);*/
     }
 
+	 public static void applySketchEffect(String inputPath, String outputPath) {
+		/* 
+        Mat image = Imgcodecs.imread(inputPath);
+        if (image.empty()) {
+            System.out.println("❌ Could not load image");
+            return;
+        }
+
+        Mat gray = new Mat();
+        Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
+
+        Mat inverted = new Mat();
+        Core.bitwise_not(gray, inverted);
+
+        Mat blurred = new Mat();
+        Imgproc.GaussianBlur(inverted, blurred, new Size(21, 21), 0);
+
+        Mat invertedBlur = new Mat();
+        Core.bitwise_not(blurred, invertedBlur);
+
+        Mat sketch = new Mat();
+        Core.divide(gray, invertedBlur, sketch, 256.0);
+
+        Imgcodecs.imwrite(outputPath, sketch);
+        System.out.println("✅ Sketch effect saved to " + outputPath);
+		*/
+    }
+
+    public static void applyCartoonPrepEffect(String inputPath, String outputPath) {
+		/* 
+        Mat img = Imgcodecs.imread(inputPath);
+        if (img.empty()) {
+            System.out.println("❌ Could not load image");
+            return;
+        }
+
+        Imgproc.resize(img, img, new Size(512, 512));
+
+        Mat filtered = img.clone();
+        for (int i = 0; i < 7; i++) {
+            Mat temp = new Mat();
+            Imgproc.bilateralFilter(filtered, temp, 9, 75, 75);
+            filtered = temp;
+        }
+
+        Imgcodecs.imwrite(outputPath, filtered);
+        System.out.println("✅ Cartoon prep effect saved to " + outputPath);
+		*/
+    }
+
+    public static void applySobelEdge(String inputPath, String outputPath) {
+		/* 
+        Mat gray = Imgcodecs.imread(inputPath, Imgcodecs.IMREAD_GRAYSCALE);
+        if (gray.empty()) {
+            System.out.println("❌ Could not load image");
+            return;
+        }
+
+        Mat gradX = new Mat();
+        Mat gradY = new Mat();
+        Imgproc.Sobel(gray, gradX, CvType.CV_16S, 1, 0);
+        Imgproc.Sobel(gray, gradY, CvType.CV_16S, 0, 1);
+
+        Mat absX = new Mat();
+        Mat absY = new Mat();
+        Core.convertScaleAbs(gradX, absX);
+        Core.convertScaleAbs(gradY, absY);
+
+        Mat sobelOutput = new Mat();
+        Core.addWeighted(absX, 0.5, absY, 0.5, 0, sobelOutput);
+
+        Imgcodecs.imwrite(outputPath, sobelOutput);
+        System.out.println("✅ Sobel edge effect saved to " + outputPath);
+		*/
+    }
+		
+
+
 
 }
+
