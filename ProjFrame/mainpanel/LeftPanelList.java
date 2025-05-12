@@ -1,6 +1,7 @@
 package mainpanel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Image;
 import java.io.File;
 import java.util.List;
@@ -15,7 +16,7 @@ import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
 
 public class LeftPanelList {
-	public static void listListener(File selectedfile,FileListDataModel filelistmodel,JList<FileListDataModel> list,
+	public static File listListener(File selectedfile,FileListDataModel filelistmodel,JList<FileListDataModel> list,
 			JScrollPane scrollPane_1,List<JList<FileListDataModel>> super_list_1,imgpanel mainImage,JPanel contentPane
 			) {
 		selectedfile = filelistmodel.getElementAt(list.getSelectedIndex(),true);
@@ -32,7 +33,7 @@ public class LeftPanelList {
 		//mainImage.setLayout(null);
 		
 		contentPane.add(mainImage, BorderLayout.CENTER);
-		
+		//contentPane.getcomponen
 		//mainImage.updateUI();
 		/*
 		int scalex=10 ,scaley=10;
@@ -84,6 +85,9 @@ public class LeftPanelList {
 		});*/
 		image_tmp.release();
 		bufImage.flush();
+		}else if (selectedfile.getName().endsWith(".txt") || selectedfile.getName().endsWith(".fdb")) {
+			//contentPane.remove();
 		}
+		return selectedfile;
 	}
 }

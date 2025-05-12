@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.SwingUtilities;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -39,6 +40,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.w3c.dom.css.Rect;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -57,9 +60,15 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 
+
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+import org.opencv.core.TermCriteria;
 import org.opencv.highgui.HighGui;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -76,7 +85,7 @@ public class Main extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private ImgDataBase database;
-	File selectedfile ;//TODO
+	static File selectedfile ;//TODO
 	
 	static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -136,6 +145,68 @@ public class Main extends JFrame {
 		JScrollPane scrollPane3 = new JScrollPane();  // Yeni nesne!
 		tabbedPane_2.addTab("Functions", null, scrollPane3, null);
 
+		// Fonksiyonlar için panel oluşturuyoruz
+    	JPanel functionPanel = new JPanel();
+    	functionPanel.setLayout(new BoxLayout(functionPanel, BoxLayout.Y_AXIS));
+    	scrollPane3.setViewportView(functionPanel);
+    
+    	// Başlık butonları (Color ve Shape başlıkları)
+    	JButton colorButton = new JButton("Color");
+    	colorButton.addActionListener(e -> {
+    		functionPanel.removeAll();  // Önceki butonları temizle
+
+    		JButton medianBlurButton = new JButton("Apply Median Blur");
+    		medianBlurButton.addActionListener(evt -> 
+        		applyMedianBlur("resources/images/image1.jpg", "output/image1.jpg")
+    		);
+
+    		JButton cannyButton = new JButton("Apply Canny Edge Detection");
+    		cannyButton.addActionListener(evt -> 
+        		applyCanny("resources/images/image2.jpg", "output/image2.jpg")
+    		);
+
+    		JButton brightnessContrastButton = new JButton("Adjust Brightness & Contrast");
+    		brightnessContrastButton.addActionListener(evt -> 
+        		adjustBrightnessContrast("resources/images/image4.jpg", "output/image4.jpg", 1.5, 50)
+    		);
+
+    		JButton kMeansButton = new JButton("Apply K-Means Color Clustering");
+   			kMeansButton.addActionListener(evt -> 
+        		applyDominantColorKMeans("resources/images/image3.jpg", "output/image3.jpg", 5)
+    		);
+
+    // Butonları panele ekle
+    		functionPanel.add(medianBlurButton);
+    		functionPanel.add(cannyButton);
+    		functionPanel.add(brightnessContrastButton);
+    		functionPanel.add(kMeansButton);
+
+    		functionPanel.revalidate();
+    		functionPanel.repaint();
+		});
+
+    
+    	JButton shapeButton = new JButton("Shape");
+    	shapeButton.addActionListener(e -> {
+        	// Şekil filtresi ile ilgili butonları ekle
+        	functionPanel.removeAll();  // Önceki butonları temizle
+        	JButton shapeFilterButton = new JButton("Apply Shape Filter");
+        	shapeFilterButton.addActionListener(evt -> applyShapeFilter());
+        	functionPanel.add(shapeFilterButton);
+        	functionPanel.revalidate();
+        	functionPanel.repaint();
+    	});
+    
+    	// Func type başlığına butonları ekleyelim
+    	JPanel funcTypePanel = new JPanel();
+    	funcTypePanel.setLayout(new BoxLayout(funcTypePanel, BoxLayout.Y_AXIS));
+    	funcTypePanel.add(colorButton);
+    	funcTypePanel.add(shapeButton);
+    	scrollPane2.setViewportView(funcTypePanel);
+
+
+		
+
 		
 		//projlistmodel is changed to be created at file opening
 		
@@ -151,8 +222,9 @@ public class Main extends JFrame {
 		JList<FileListDataModel> list = new JList<FileListDataModel>(filelistmodel);
 		imgpanel mainImage = new imgpanel();
 		list.addListSelectionListener(e -> {
-			LeftPanelList.listListener(selectedfile,filelistmodel,list,scrollPane_1,super_list_1,mainImage,this.contentPane);
+			selectedfile = LeftPanelList.listListener(selectedfile,filelistmodel,list,scrollPane_1,super_list_1,mainImage,this.contentPane);
 		});
+		
 		scrollPane.setViewportView(list);
 		
 		//input klasöründeki tüm dosyaları listeye almak için
@@ -351,5 +423,77 @@ public class Main extends JFrame {
     	}
 	}
 
+	
+
+	private void applyShapeFilter() {
+    // Shape filtresi fonksiyonu
+    	System.out.println("Applying shape filter...");
+    // Burada istediğiniz işlemi yapabilirsiniz
+	}
+
+
+	public static void applyMedianBlur(String inputPath, String outputPath) {
+		//TODO DO NOT REWRİTE THE input file
+		System.out.println(selectedfile.getAbsolutePath());
+        Mat src = Imgcodecs.imread(selectedfile.getAbsolutePath());
+        Mat dst = new Mat();
+        Imgproc.medianBlur(src, dst, 5);
+        Imgcodecs.imwrite(selectedfile.getAbsolutePath(), dst);
+    }
+
+    public static void applyCanny(String inputPath, String outputPath) {
+    	
+        Mat src = Imgcodecs.imread(selectedfile.getAbsolutePath());
+        Mat gray = new Mat();
+        Mat edges = new Mat();
+
+        Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.Canny(gray, edges, 100, 200);
+        Imgcodecs.imwrite(selectedfile.getAbsolutePath(), edges);
+    }
+
+    public static void adjustBrightnessContrast(String inputPath, String outputPath, double alpha, double beta) {
+    	
+        Mat src = Imgcodecs.imread(selectedfile.getAbsolutePath());
+        Mat dst = new Mat();
+        src.convertTo(dst, -1, alpha, beta);
+        Imgcodecs.imwrite(selectedfile.getAbsolutePath(), dst);
+    }
+
+    public static void applyDominantColorKMeans(String inputPath, String outputPath, int k) {
+    	
+        Mat src = Imgcodecs.imread(selectedfile.getAbsolutePath());
+        Mat reshaped = src.reshape(1, src.cols() * src.rows());
+        Mat reshaped32f = new Mat();
+        reshaped.convertTo(reshaped32f, CvType.CV_32F);
+
+        Mat labels = new Mat();
+        Mat centers = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 10, 1.0);
+
+        Core.kmeans(reshaped32f, k, labels, criteria, 3, Core.KMEANS_PP_CENTERS, centers);
+        centers.convertTo(centers, CvType.CV_8U);
+
+        // Yeni görsel: genişlik = 100*k, yükseklik = 100
+        int boxWidth = 100;
+        int boxHeight = 100;
+        Mat colorBoxes = new Mat(boxHeight, boxWidth * k, CvType.CV_8UC3);
+
+        for (int i = 0; i < k; i++) {
+            byte[] colorBytes = new byte[3];
+            centers.get(i, 0, colorBytes);
+            Scalar scalarColor = new Scalar(
+                    Byte.toUnsignedInt(colorBytes[0]),
+                    Byte.toUnsignedInt(colorBytes[1]),
+                    Byte.toUnsignedInt(colorBytes[2])
+            );
+
+            org.opencv.core.Rect rect = new org.opencv.core.Rect(i * boxWidth, 0, boxWidth, boxHeight);
+            Imgproc.rectangle(colorBoxes, rect, scalarColor, -1);
+        }
+
+        Imgcodecs.imwrite(selectedfile.getAbsolutePath(), colorBoxes);
+        
+    }
 
 }
