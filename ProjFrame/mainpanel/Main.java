@@ -1,6 +1,6 @@
 package mainpanel;
 
-
+import java.awt.Dimension;
 import java.awt.Color;
 import javax.swing.UIManager;
 import java.awt.EventQueue;
@@ -18,6 +18,7 @@ import java.util.Scanner;
 
 
 import javax.swing.SwingUtilities;
+import javax.smartcardio.CardChannel;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -31,9 +32,11 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -127,34 +130,91 @@ public class Main extends JFrame {
     
     	// Başlık butonları (Color ve Shape başlıkları)
     	JButton colorButton = new JButton("Color");
+		colorButton.setMinimumSize(new Dimension(200, 50));
+		colorButton.setMaximumSize(new Dimension(200, 50));
+		colorButton.setPreferredSize(new Dimension(200, 50));
     	colorButton.addActionListener(e -> {
     		functionPanel.removeAll();  // Önceki butonları temizle
 
     		JButton medianBlurButton = new JButton("Apply Median Blur");
+			medianBlurButton.setMinimumSize(new Dimension(200, 50));
+			medianBlurButton.setMaximumSize(new Dimension(200, 50));
+			medianBlurButton.setPreferredSize(new Dimension(200, 50));
     		medianBlurButton.addActionListener(evt -> 
         		applyMedianBlur("resources/images/image1.jpg", "output/image1.jpg")
     		);
 
     		JButton cannyButton = new JButton("Apply Canny Edge Detection");
+			cannyButton.setMinimumSize(new Dimension(200, 50));
+			cannyButton.setMaximumSize(new Dimension(200, 50));
+			cannyButton.setPreferredSize(new Dimension(200, 50));
     		cannyButton.addActionListener(evt -> 
         		applyCanny("resources/images/image2.jpg", "output/image2.jpg")
     		);
 
     		JButton brightnessContrastButton = new JButton("Adjust Brightness & Contrast");
+			brightnessContrastButton.setMinimumSize(new Dimension(200, 50));
+			brightnessContrastButton.setMaximumSize(new Dimension(200, 50));
+			brightnessContrastButton.setPreferredSize(new Dimension(200, 50));
     		brightnessContrastButton.addActionListener(evt -> 
         		adjustBrightnessContrast("resources/images/image4.jpg", "output/image4.jpg", 1.5, 50)
     		);
 
     		JButton kMeansButton = new JButton("Apply K-Means Color Clustering");
+			kMeansButton.setMinimumSize(new Dimension(200, 50));
+			kMeansButton.setMaximumSize(new Dimension(200, 50));
+			kMeansButton.setPreferredSize(new Dimension(200, 50));
    			kMeansButton.addActionListener(evt -> 
         		applyDominantColorKMeans("resources/images/image3.jpg", "output/image3.jpg", 5)
     		);
+
+			JPanel rgbPanel = new JPanel();
+			rgbPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+			rgbPanel.setPreferredSize(new Dimension(200, 200));
+			rgbPanel.setMinimumSize(new Dimension(200, 200));
+			rgbPanel.setMaximumSize(new Dimension(200, 200));
+			rgbPanel.setBackground(Color.LIGHT_GRAY);
+			
+
+			rgbPanel.setLayout(new BoxLayout(rgbPanel, BoxLayout.Y_AXIS));
+
+			JLabel rLabel = new JLabel("R:");
+			JTextField rField = new JTextField("0-255 arası değer girin");
+			rField.setMaximumSize(new Dimension(300, 35));
+			
+			JLabel gLabel = new JLabel("G:");
+			JTextField gField = new JTextField("0-255 arası değer girin");
+			gField.setMaximumSize(new Dimension(300, 35));
+			
+			JLabel bLabel = new JLabel("B:");
+			JTextField bField = new JTextField("0-255 arası değer girin");
+			bField.setMaximumSize(new Dimension(300, 35));
+
+			JButton applyRgbBtn = new JButton("Apply RGB Filter");
+			applyRgbBtn.addActionListener(evt -> {
+				try {
+					int r = Integer.parseInt(rField.getText());
+					int g = Integer.parseInt(gField.getText());
+					int b = Integer.parseInt(bField.getText());
+					applyRgbFilter(r, g, b);
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "Geçerli RGB değerleri girin (0-255).");
+				}
+			});
+
+			rgbPanel.add(rLabel); rgbPanel.add(rField);
+			rgbPanel.add(gLabel); rgbPanel.add(gField);
+			rgbPanel.add(bLabel); rgbPanel.add(bField);
+			rgbPanel.add(applyRgbBtn);
+
 
     // Butonları panele ekle
     		functionPanel.add(medianBlurButton);
     		functionPanel.add(cannyButton);
     		functionPanel.add(brightnessContrastButton);
     		functionPanel.add(kMeansButton);
+			functionPanel.add(new JSeparator());
+    		functionPanel.add(rgbPanel);
 
     		functionPanel.revalidate();
     		functionPanel.repaint();
@@ -162,23 +222,35 @@ public class Main extends JFrame {
 
 		// Başlık butonları (Effect başlığı)
 		JButton effectButton = new JButton("Effect");
+		effectButton.setMinimumSize(new Dimension(200, 50));
+		effectButton.setMaximumSize(new Dimension(200, 50));
+		effectButton.setPreferredSize(new Dimension(200, 50));
 		effectButton.addActionListener(e -> {
 			functionPanel.removeAll();  // Önceki butonları temizle
 
 			// Sketch Effect butonu
 			JButton sketchButton = new JButton("Apply Sketch Effect");
+			sketchButton.setMinimumSize(new Dimension(200, 50));
+			sketchButton.setMaximumSize(new Dimension(200, 50));
+			sketchButton.setPreferredSize(new Dimension(200, 50));
 			sketchButton.addActionListener(evt ->
 				applySketchEffect("resources/images/image1.jpg", "output/sketch.jpg")
 			);
 
 			// Cartoon Prep Effect butonu
 			JButton cartoonButton = new JButton("Apply Cartoon Prep Effect");
+			cartoonButton.setMinimumSize(new Dimension(200, 50));
+			cartoonButton.setMaximumSize(new Dimension(200, 50));
+			cartoonButton.setPreferredSize(new Dimension(200, 50));
 			cartoonButton.addActionListener(evt ->
 				applyCartoonPrepEffect("resources/images/image2.jpg", "output/cartoon.jpg")
 			);
 
 			// Sobel Edge butonu
 			JButton sobelButton = new JButton("Apply Sobel Edge Detection");
+			sobelButton.setMinimumSize(new Dimension(200, 50));
+			sobelButton.setMaximumSize(new Dimension(200, 50));
+			sobelButton.setPreferredSize(new Dimension(200, 50));
 			sobelButton.addActionListener(evt ->
 				applySobelEdge("resources/images/image3.jpg", "output/sobel.jpg")
 			);
@@ -195,10 +267,16 @@ public class Main extends JFrame {
 
     
     	JButton shapeButton = new JButton("Shape");
+		shapeButton.setMinimumSize(new Dimension(200, 50));
+		shapeButton.setMaximumSize(new Dimension(200, 50));
+		shapeButton.setPreferredSize(new Dimension(200, 50));
     	shapeButton.addActionListener(e -> {
         	// Şekil filtresi ile ilgili butonları ekle
         	functionPanel.removeAll();  // Önceki butonları temizle
         	JButton shapeFilterButton = new JButton("Apply Shape Filter");
+			shapeFilterButton.setMinimumSize(new Dimension(200, 50));
+			shapeFilterButton.setMaximumSize(new Dimension(200, 50));
+			shapeFilterButton.setPreferredSize(new Dimension(200, 50));
         	shapeFilterButton.addActionListener(evt -> applyShapeFilter());
         	functionPanel.add(shapeFilterButton);
         	functionPanel.revalidate();
@@ -655,6 +733,56 @@ public class Main extends JFrame {
         System.out.println("✅ Sobel edge effect saved to " + outputPath);
 		*/
     }
+
+	public static void applyRgbFilter(int targetR, int targetG, int targetB) {
+		try {
+			// Değer sınaması
+			if (targetR < 0 || targetR > 255 || targetG < 0 || targetG > 255 || targetB < 0 || targetB > 255) {
+				JOptionPane.showMessageDialog(null, "⚠️ RGB değerleri 0 ile 255 arasında olmalıdır.");
+				return;
+			}
+
+			int tolerance = 30;
+			/* 
+			Mat image = Imgcodecs.imread("resources/images/image4.jpg");
+
+			if (image.empty()) {
+				JOptionPane.showMessageDialog(null, "❌ Görsel yüklenemedi. Dosya yolu hatalı olabilir.");
+				return;
+			}
+
+			Mat result = new Mat(image.rows(), image.cols(), CvType.CV_8UC1);
+			for (int y = 0; y < image.rows(); y++) {
+				for (int x = 0; x < image.cols(); x++) {
+					double[] rgb = image.get(y, x);
+					if (rgb == null || rgb.length < 3) continue; // Veri eksikse geç
+
+					int b = (int) rgb[0];
+					int g = (int) rgb[1];
+					int r = (int) rgb[2];
+
+					if (Math.abs(r - targetR) < tolerance &&
+						Math.abs(g - targetG) < tolerance &&
+						Math.abs(b - targetB) < tolerance) {
+						result.put(y, x, 255);
+					} else {
+						result.put(y, x, 0);
+					}
+				}
+			}
+
+			Imgcodecs.imwrite("output/rgb_filtered.jpg", result);
+			JOptionPane.showMessageDialog(null, "✅ RGB filtre uygulandı!");
+			*/
+			
+		} catch (NumberFormatException ex) {
+			JOptionPane.showMessageDialog(null, "❌ Sayısal olmayan bir değer girdiniz. Lütfen sadece rakam kullanın.");
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "❌ Bir hata oluştu: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+	}
+
 		
 
 
