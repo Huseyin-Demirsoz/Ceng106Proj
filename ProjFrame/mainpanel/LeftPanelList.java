@@ -4,12 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionListener;
 
 import org.opencv.core.Mat;
@@ -17,8 +20,7 @@ import org.opencv.highgui.HighGui;
 
 public class LeftPanelList {
 	public static File listListener(File selectedfile,FileListDataModel filelistmodel,JList<FileListDataModel> list,
-			JScrollPane scrollPane_1,List<JList<FileListDataModel>> super_list_1,imgpanel mainImage,JPanel contentPane
-			) {
+			JScrollPane scrollPane_1,List<JList<FileListDataModel>> super_list_1,imgpanel mainImage,JPanel contentPane) {
 		selectedfile = filelistmodel.getElementAt(list.getSelectedIndex(),true);
 		scrollPane_1.setViewportView(super_list_1.get(list.getSelectedIndex()));
 		
@@ -35,7 +37,8 @@ public class LeftPanelList {
 		contentPane.add(mainImage, BorderLayout.CENTER);
 		//contentPane.getcomponen
 		//mainImage.updateUI();
-		/*
+
+		if(mainImage.getHeight()!=0 && mainImage.getWidth()!=0){
 		int scalex=10 ,scaley=10;
 		if(mainImage.getWidth()>mainImage.getHeight()){
 			scalex=mainImage.getHeight()*(bufImage.getWidth(null)/bufImage.getHeight(null));
@@ -43,13 +46,20 @@ public class LeftPanelList {
 		}else {
 			scalex=mainImage.getWidth()*(bufImage.getWidth(null)/bufImage.getHeight(null));
 			scaley=mainImage.getWidth();
-		}*/
+		}
+		
 		/*mainImage.setBounds(10,10,scalex,scaley);
 		mainImage.setLayout(null);
 		
 		mainImage.setBounds(mainImage.getX(),mainImage.getY(),scalex,scaley);
 		*/
-		mainImage.setimg(bufImage.getScaledInstance(bufImage.getWidth(null), bufImage.getHeight(null),Image.SCALE_SMOOTH ));
+		mainImage.setimg(bufImage.getScaledInstance(
+				scalex
+				//bufImage.getWidth(null)
+				,scaley 
+				//bufImage.getHeight(null)
+				,Image.SCALE_SMOOTH ));
+		}
 		//this.contentPane.add(mainImage, BorderLayout.CENTER);
 		
 		mainImage.updateUI();
@@ -85,8 +95,6 @@ public class LeftPanelList {
 		});*/
 		image_tmp.release();
 		bufImage.flush();
-		}else if (selectedfile.getName().endsWith(".txt") || selectedfile.getName().endsWith(".fdb")) {
-			//contentPane.remove();
 		}
 		return selectedfile;
 	}

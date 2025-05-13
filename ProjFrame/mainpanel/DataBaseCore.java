@@ -119,375 +119,379 @@ class ImgDataBase extends DataBaseCore{
 }
 
 class FunctionDataBase extends DataBaseCore{
-	public void Parse(String path){
-		String reader;
-		
+	public void Parse(Path filepath){
 		try {
-			reader = new Scanner(new File(path)).useDelimiter("\\Z").next();
-			//int current;
-			Stack<String> progstack = new Stack<String>();
-			Stack<Mat> imgpassingbuff = new Stack<Mat>();
-			enum state{
-				CODE,COMMENT
-			} 
-			state status=state.CODE;
-			
-			for(int i =0; i<reader.length()-1;i++){
-				switch(status) {
-					case CODE:
-						switch(reader.charAt(i)) {
-							case '/':
-								//checks for comment block opening
-								if(reader.charAt(i+1)=='*'){
-									status=state.COMMENT;
-									i++;
-									break;
-								}
-							break;
-							case '#':{
-								//for pushing images onto the stack for functions
-								//this is in the form of:
-								//# "IMGPATH"
-								//Farklı versyonları vardır
-								// quotation version
-								i++;
-								int start=i,stop=i;
-								while(reader.charAt(start)!='"') {
-									//For dropping white space before path
-									start++;
-									i++;
-									if(reader.charAt(i)=='\n') {
-										//TODO erroneous code found -> bad image path -> exited without giving path
-										System.err.println("ERROR");
-										break;
-									}
-								}
-								start++;
-								stop = start;
-								while(reader.charAt(stop)!='"') {
-									stop++;
-									i++;
-									if(reader.charAt(i)=='\n') {
-										//TODO erroneous code found -> bad image path -> exited without giving path
-										System.err.println("ERROR");
-										break;
-									}
-								}
-								progstack.push(reader.substring(start, stop));
-							}break;
-							case '%':{
-								//% denotes functions in the form of 
-								//% "function name"
-								i++;
-								int start=i,stop=i;
-								while(reader.charAt(start)!='"') {
-									//For dropping white space before path
-									start++;
-									i++;
-									if(reader.charAt(i)=='\n') {
-										//TODO erroneous code found -> bad image path -> exited without giving path
-										System.err.println("ERROR");
-										break;
-									}
-								}
-								start++;
-								stop = start;
-								while(reader.charAt(stop)!='"') {
-									stop++;
-									i++;
-									if(reader.charAt(i)=='\n') {
-										//TODO erroneous code found -> bad image path -> exited without giving path
-										System.err.println("ERROR");
-										break;
-									}
-								}
-								/* Bitmiş fonksyonlar:
-									ToGrayScale
-									Gaussian Blur
-									Canny
-								
-								*/
-								switch (reader.substring(start, stop)){
-									case "ToGrayScale":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											//dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, in0, Imgproc.COLOR_RGB2GRAY);// This is not used because it collapses channels 3 to 1
-											List<Mat> color = new ArrayList<Mat>(3);
-											Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2HSV);
-											Core.split(dest, color);
-											color.set(1, color.get(1).setTo(new Scalar(0)));
-											Core.merge(color, dest);
-											Imgproc.cvtColor(dest, dest, Imgproc.COLOR_HSV2RGB);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Dominant Color":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Canny":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											Double in1=0.,in2=0.;
-											if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
-												String[] nums =progstack.peek().split(",");
-												//The gaussian kernel can not be a modulo of 2
-												in1= Double.parseDouble(nums[0]);
-												in2= Double.parseDouble(nums[1]);
-												progstack.pop();
-											}else {
-												System.err.println("ERROR: Bad treshold values");
-												break;
-											}
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											//dest = in0; // DEBUG NO-OP function
-											
-											//To Grayscale before applying canny
-											List<Mat> color = new ArrayList<Mat>(3);
-											Imgproc.cvtColor(in0, in0, Imgproc.COLOR_RGB2HSV);
-											Core.split(in0, color);
-											color.set(1, color.get(1).setTo(new Scalar(0)));
-											Core.merge(color, in0);
-											Imgproc.cvtColor(in0, in0, Imgproc.COLOR_HSV2RGB);
-											
-											
-											Imgproc.Canny(in0,dest, in1, in2);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Bright and Contrast":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Sketch Effect":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Sobel":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Cartoon":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Text Detection":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "RGB Manipulation":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											dest = in0; // DEBUG NO-OP function
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-									case "Gaussian Blur":{
-											Mat dest = new Mat();
-											Mat in0 = new Mat();
-											Size in1 ;
-											double in2 = 0;
-											if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8})")){
-												in2 = Double.parseDouble(progstack.pop());
-											}else {
-												System.err.println("ERROR: Bad  sigma");
-												break;
-											}
-											if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
-												String[] nums =progstack.peek().split(",");
-												//The gaussian kernel can not be a modulo of 2
-												in1= new Size(Double.parseDouble(nums[0]),Double.parseDouble(nums[1]));
-												if(in1.height%2==0||in1.width%2==0){
-													System.err.println("ERROR: Bad size. Size can not be a modulo of 2");
-													break;
-												}
-												progstack.pop();
-											}else {
-												System.err.println("ERROR: Bad size");
-												break;
-											}
-											if(!progstack.peek().equals("stack")){
-												in0 = Imgcodecs.imread(progstack.pop());
-											}else{
-												progstack.pop();
-												in0 = imgpassingbuff.pop();
-											}
-											//dest = in0; // DEBUG NO-OP function
-											Imgproc.GaussianBlur(in0, dest, in1, in2);
-											//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-											if(!progstack.peek().equals("stack")){
-												Imgcodecs.imwrite(progstack.pop(), dest);
-											}else{
-												progstack.pop();
-												imgpassingbuff.push(dest);
-											}
-										}break;
-										
-								}
-							}break;
-						}
-						break;
-					case COMMENT:
-						if(reader.charAt(i)=='*'){
-							if(reader.charAt(i+1)=='/'){
-								status=state.CODE;
-								i++;
-								//System.out.append('\n');
-								break;
-							}
-						}
-						//System.out.append(reader.charAt(i));
-						break;
-				default:
-					break;
-				}
-				
-			}
-			while(!progstack.empty()) {
-				System.out.println( progstack.pop());
-			}
-			
-			reader =null;
-			System.gc();
-		} catch (IOException e) {
+			this.Parse(new Scanner(new File(filepath.toString())).useDelimiter("\\Z").next());
+		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public void Parse(String text){
+		//String text;
+		
+		//text = new Scanner(new File(path)).useDelimiter("\\Z").next();
+		//text =programtext;
+		//int current;
+		Stack<String> progstack = new Stack<String>();
+		Stack<Mat> imgpassingbuff = new Stack<Mat>();
+		enum state{
+			CODE,COMMENT
+		} 
+		state status=state.CODE;
+		
+		for(int i =0; i<text.length()-1;i++){
+			switch(status) {
+				case CODE:
+					switch(text.charAt(i)) {
+						case '/':
+							//checks for comment block opening
+							if(text.charAt(i+1)=='*'){
+								status=state.COMMENT;
+								i++;
+								break;
+							}
+						break;
+						case '#':{
+							//for pushing images onto the stack for functions
+							//this is in the form of:
+							//# "IMGPATH"
+							//Farklı versyonları vardır
+							// quotation version
+							i++;
+							int start=i,stop=i;
+							while(text.charAt(start)!='"') {
+								//For dropping white space before path
+								start++;
+								i++;
+								if(text.charAt(i)=='\n') {
+									//TODO erroneous code found -> bad image path -> exited without giving path
+									System.err.println("ERROR");
+									break;
+								}
+							}
+							start++;
+							stop = start;
+							while(text.charAt(stop)!='"') {
+								stop++;
+								i++;
+								if(text.charAt(i)=='\n') {
+									//TODO erroneous code found -> bad image path -> exited without giving path
+									System.err.println("ERROR");
+									break;
+								}
+							}
+							progstack.push(text.substring(start, stop));
+						}break;
+						case '%':{
+							//% denotes functions in the form of 
+							//% "function name"
+							i++;
+							int start=i,stop=i;
+							while(text.charAt(start)!='"') {
+								//For dropping white space before path
+								start++;
+								i++;
+								if(text.charAt(i)=='\n') {
+									//TODO erroneous code found -> bad image path -> exited without giving path
+									System.err.println("ERROR");
+									break;
+								}
+							}
+							start++;
+							stop = start;
+							while(text.charAt(stop)!='"') {
+								stop++;
+								i++;
+								if(text.charAt(i)=='\n') {
+									//TODO erroneous code found -> bad image path -> exited without giving path
+									System.err.println("ERROR");
+									break;
+								}
+							}
+							/* Bitmiş fonksyonlar:
+								ToGrayScale
+								Gaussian Blur
+								Canny
+							
+							*/
+							switch (text.substring(start, stop)){
+								case "ToGrayScale":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										//dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, in0, Imgproc.COLOR_RGB2GRAY);// This is not used because it collapses channels 3 to 1
+										List<Mat> color = new ArrayList<Mat>(3);
+										Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2HSV);
+										Core.split(dest, color);
+										color.set(1, color.get(1).setTo(new Scalar(0)));
+										Core.merge(color, dest);
+										Imgproc.cvtColor(dest, dest, Imgproc.COLOR_HSV2RGB);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Dominant Color":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Canny":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										Double in1=0.,in2=0.;
+										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
+											String[] nums =progstack.peek().split(",");
+											//The gaussian kernel can not be a modulo of 2
+											in1= Double.parseDouble(nums[0]);
+											in2= Double.parseDouble(nums[1]);
+											progstack.pop();
+										}else {
+											System.err.println("ERROR: Bad treshold values");
+											break;
+										}
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										//dest = in0; // DEBUG NO-OP function
+										
+										//To Grayscale before applying canny
+										List<Mat> color = new ArrayList<Mat>(3);
+										Imgproc.cvtColor(in0, in0, Imgproc.COLOR_RGB2HSV);
+										Core.split(in0, color);
+										color.set(1, color.get(1).setTo(new Scalar(0)));
+										Core.merge(color, in0);
+										Imgproc.cvtColor(in0, in0, Imgproc.COLOR_HSV2RGB);
+										
+										
+										Imgproc.Canny(in0,dest, in1, in2);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Bright and Contrast":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Sketch Effect":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Sobel":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Cartoon":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Text Detection":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "RGB Manipulation":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										dest = in0; // DEBUG NO-OP function
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+								case "Gaussian Blur":{
+										Mat dest = new Mat();
+										Mat in0 = new Mat();
+										Size in1 ;
+										double in2 = 0;
+										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8})")){
+											in2 = Double.parseDouble(progstack.pop());
+										}else {
+											System.err.println("ERROR: Bad  sigma");
+											break;
+										}
+										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
+											String[] nums =progstack.peek().split(",");
+											//The gaussian kernel can not be a modulo of 2
+											in1= new Size(Double.parseDouble(nums[0]),Double.parseDouble(nums[1]));
+											if(in1.height%2==0||in1.width%2==0){
+												System.err.println("ERROR: Bad size. Size can not be a modulo of 2");
+												break;
+											}
+											progstack.pop();
+										}else {
+											System.err.println("ERROR: Bad size");
+											break;
+										}
+										if(!progstack.peek().equals("stack")){
+											in0 = Imgcodecs.imread(progstack.pop());
+										}else{
+											progstack.pop();
+											in0 = imgpassingbuff.pop();
+										}
+										//dest = in0; // DEBUG NO-OP function
+										Imgproc.GaussianBlur(in0, dest, in1, in2);
+										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										if(!progstack.peek().equals("stack")){
+											Imgcodecs.imwrite(progstack.pop(), dest);
+										}else{
+											progstack.pop();
+											imgpassingbuff.push(dest);
+										}
+									}break;
+									
+							}
+						}break;
+					}
+					break;
+				case COMMENT:
+					if(text.charAt(i)=='*'){
+						if(text.charAt(i+1)=='/'){
+							status=state.CODE;
+							i++;
+							//System.out.append('\n');
+							break;
+						}
+					}
+					//System.out.append(text.charAt(i));
+					break;
+			default:
+				break;
+			}
+			
+		}
+		while(!progstack.empty()) {
+			System.out.println( progstack.pop());
+		}
+		
+		text =null;
+		System.gc();
 		
 		
 		/*
-		Scanner reader;
+		Scanner text;
 		try {
-			reader = new Scanner(tableObj.get(0).file).useDelimiter("\\S");
+			text = new Scanner(tableObj.get(0).file).useDelimiter("\\S");
 			String current;
 			enum state{
 				CODE,COMMENT
 			} 
 			state status=state.CODE;
-			while(reader.hasNext()) {
-				current = reader.next();
+			while(text.hasNext()) {
+				current = text.next();
 				if(current=="/") {
-					if(reader.) {
-						reader.skip("\\*\\/");
+					if(text.) {
+						text.skip("\\*\\/");
 					}
 				}
 			}
-			reader.close();
+			text.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

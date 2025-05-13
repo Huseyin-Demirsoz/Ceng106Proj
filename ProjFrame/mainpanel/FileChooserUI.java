@@ -20,6 +20,9 @@ public class FileChooserUI {
 			try{
 				//file selected -> get path -> try to pull string until EOF(\\Z)
 				file = new File(xfile_chooser.getSelectedFile().getAbsolutePath());
+				String str ="A/B/C/D";
+				
+				
 				/*try {
 					//TODO: Parse file, prints out file for debug purposes
 					String xfile_content = new Scanner(file).useDelimiter("\\Z").next();

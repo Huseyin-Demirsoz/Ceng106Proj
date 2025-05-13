@@ -12,12 +12,15 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
@@ -37,6 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -58,6 +63,8 @@ import javax.swing.ImageIcon;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 
@@ -65,15 +72,18 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.core.TermCriteria;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -85,6 +95,7 @@ public class Main extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private ImgDataBase database;
+	private JTextArea textarea;
 	static File selectedfile ;//TODO
 	
 	static {
@@ -107,23 +118,26 @@ public class Main extends JFrame {
 		});
 	}
 	
+	//@SuppressWarnings("unused")
 	public Main() {
 		//since the public class inherits from the JFrame, methods can be called on with "this" but it is usually not necessary
 		// Additional this added for clarity
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(100, 100, 800, 500);
+		this.setBounds(100, 100, 1200,900);
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		database = new ImgDataBase();
 		//TODO DEBUG
 		FunctionDataBase functions = new FunctionDataBase();
-		functions.Parse("/home/hd/Desktop/projtestfile.txt");// TODO DEBUG file
+		functions.Parse(Paths.get("/home/hd/Desktop/projtestfile.txt"));// TODO DEBUG file
 		
 		this.setContentPane(contentPane);
 		BorderLayout mainborder= new BorderLayout();
+		
 		mainborder.setHgap(8);
 		mainborder.setVgap(8);
 		this.contentPane.setLayout(mainborder);
+
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		this.contentPane.add(tabbedPane_1, BorderLayout.WEST);
@@ -136,14 +150,14 @@ public class Main extends JFrame {
 
 
 
-		JTabbedPane tabbedPane_2 = new JTabbedPane(JTabbedPane.TOP);
-		this.contentPane.add(tabbedPane_2, BorderLayout.EAST);
+		JTabbedPane functiontab = new JTabbedPane(JTabbedPane.TOP);
+		this.contentPane.add(functiontab, BorderLayout.EAST);
 
 		JScrollPane scrollPane2 = new JScrollPane();  // Yeni nesne!
-		tabbedPane_2.addTab("Func type", null, scrollPane2, null);
+		functiontab.addTab("Func type", null, scrollPane2, null);
 
 		JScrollPane scrollPane3 = new JScrollPane();  // Yeni nesne!
-		tabbedPane_2.addTab("Functions", null, scrollPane3, null);
+		functiontab.addTab("Functions", null, scrollPane3, null);
 
 		// Fonksiyonlar için panel oluşturuyoruz
     	JPanel functionPanel = new JPanel();
@@ -184,6 +198,41 @@ public class Main extends JFrame {
     		functionPanel.revalidate();
     		functionPanel.repaint();
 		});
+    	// Başlık butonları (Effect başlığı)
+    			JButton effectButton = new JButton("Effect");
+    			effectButton.addActionListener(e -> {
+    				functionPanel.removeAll();  // Önceki butonları temizle
+
+    				// Sketch Effect butonu
+    				JButton sketchButton = new JButton("Apply Sketch Effect");
+    				sketchButton.addActionListener(evt ->
+    					//applySketchEffect("resources/images/image1.jpg", "output/sketch.jpg")
+    				applySketchEffect()
+    				);
+
+    				// Cartoon Prep Effect butonu
+    				JButton cartoonButton = new JButton("Apply Cartoon Prep Effect");
+    				cartoonButton.addActionListener(evt ->
+    					//applyCartoonPrepEffect("resources/images/image2.jpg", "output/cartoon.jpg")
+    				applyCartoonPrepEffect()
+    				);
+
+    				// Sobel Edge butonu
+    				JButton sobelButton = new JButton("Apply Sobel Edge Detection");
+    				sobelButton.addActionListener(evt ->
+    					//applySobelEdge("resources/images/image3.jpg", "output/sobel.jpg")
+    				applySobelEdge()
+    				);
+
+    				// Butonları panele ekle
+    				functionPanel.add(sketchButton);
+    				functionPanel.add(cartoonButton);
+    				functionPanel.add(sobelButton);
+
+    				functionPanel.revalidate();
+    				functionPanel.repaint();
+    			});
+
 
     
     	JButton shapeButton = new JButton("Shape");
@@ -202,6 +251,7 @@ public class Main extends JFrame {
     	funcTypePanel.setLayout(new BoxLayout(funcTypePanel, BoxLayout.Y_AXIS));
     	funcTypePanel.add(colorButton);
     	funcTypePanel.add(shapeButton);
+    	funcTypePanel.add(effectButton);
     	scrollPane2.setViewportView(funcTypePanel);
 
 
@@ -215,6 +265,9 @@ public class Main extends JFrame {
 		//super_list_1 is the list of the "list elements" that get displayed 
 		//for each file for example the functions and image path contained in a database
 		
+
+    	
+    	
 		List<JList<FileListDataModel>> super_list_1 = new ArrayList<JList<FileListDataModel>>();
 		
 		//sets the JList in the project view tab to the contents of the selected file
@@ -223,6 +276,21 @@ public class Main extends JFrame {
 		imgpanel mainImage = new imgpanel();
 		list.addListSelectionListener(e -> {
 			selectedfile = LeftPanelList.listListener(selectedfile,filelistmodel,list,scrollPane_1,super_list_1,mainImage,this.contentPane);
+			if (selectedfile.getName().endsWith(".txt") || selectedfile.getName().endsWith(".fdb")) {
+				contentPane.remove(mainImage);
+				String text;
+				try {
+					text = new Scanner(selectedfile).useDelimiter("\\Z").next();
+					textarea.setText(text);
+				} catch (FileNotFoundException er) {
+					textarea.setText("");
+				} catch(java.util.NoSuchElementException r) {
+					textarea.setText("");
+				}
+				contentPane.repaint();
+			}else {
+				textarea.setText("");
+			}
 		});
 		
 		scrollPane.setViewportView(list);
@@ -248,12 +316,17 @@ public class Main extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		this.contentPane.add(tabbedPane, BorderLayout.NORTH);
 		
+		JMenuBar homebar = new JMenuBar();
+		tabbedPane.addTab("Home", null, homebar, null);
+		//JPanel menutabs = new JPanel();
+		//this.contentPane.add(menutabs, BorderLayout.NORTH);
 		//The NavBar
-		JMenuBar menuBar = new JMenuBar();
-		tabbedPane.addTab("Home", null, menuBar, null);
+		
+		//menutabs.add(homebar);
+		
 		
 		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
+		homebar.add(mnFile);
 		
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mnFile.add(mntmOpen);
@@ -272,7 +345,7 @@ public class Main extends JFrame {
 		});
 		//tema kısmı halloldu galiba
 		JMenu mnEdit = new JMenu("Edit");
-		menuBar.add(mnEdit);
+		homebar.add(mnEdit);
 		mnEdit.setHorizontalAlignment(SwingConstants.LEFT);
 		
 		JMenu mnTheme = new JMenu("Theme");
@@ -286,6 +359,60 @@ public class Main extends JFrame {
 		
 		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Light");
 		mnTheme.add(mntmNewMenuItem_2);
+		
+		BorderLayout programlayout = new BorderLayout();
+		
+		
+		JMenuBar programbar = new JMenuBar();
+		tabbedPane.addTab("Program", null, programbar, null);
+		
+		JButton runbttn = new JButton("Run");
+		programbar.add(runbttn);
+		runbttn.addActionListener(e->{
+			functions.Parse(textarea.getText());
+		});
+		JButton savebttn = new JButton("Save");
+		programbar.add(savebttn);
+		savebttn.addActionListener(e->{
+			try {
+				FileWriter writer = new FileWriter(selectedfile);
+				writer.write(textarea.getText());
+				writer.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		
+		textarea = new JTextArea ();
+		textarea.setRows(10);
+		JScrollPane textbox = new JScrollPane (textarea, 
+		   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		
+		tabbedPane.addChangeListener(e->{
+			System.out.println("Tab: " + tabbedPane.getSelectedIndex());
+			//for(Component c : this.contentPane.getComponents()){
+
+			//Find the components you want to remove
+			//Remove it
+			if(tabbedPane.getSelectedIndex()==1) {
+				System.out.println(functiontab);
+				this.contentPane.remove(functiontab);
+				this.contentPane.add(textbox, BorderLayout.SOUTH);
+				this.contentPane.repaint();
+			}else if (tabbedPane.getSelectedIndex()==0) {
+				this.contentPane.add(functiontab, BorderLayout.EAST);
+				this.contentPane.remove(textbox);
+				this.contentPane.repaint();
+			}
+			//}
+		});
+		programbar.addPropertyChangeListener(e ->{
+			
+			//this.contentPane.setLayout(programlayout);
+		});
+		
+		
 		/*
 		mntmNewMenuItem.addActionListener(e -> {
 			this.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
@@ -376,6 +503,7 @@ public class Main extends JFrame {
 		
 	}
 
+	@SuppressWarnings("unused")
 	private void applyTheme(String theme) {
 	Color background, foreground;
 
@@ -495,5 +623,82 @@ public class Main extends JFrame {
         Imgcodecs.imwrite(selectedfile.getAbsolutePath(), colorBoxes);
         
     }
+	 public static void applySketchEffect() {
+	
+       Mat image = Imgcodecs.imread(selectedfile.getAbsolutePath());
+       if (image.empty()) {
+           System.out.println("❌ Could not load image");
+           return;
+       }
+
+       Mat gray = new Mat();
+       Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
+
+       Mat inverted = new Mat();
+       Core.bitwise_not(gray, inverted);
+
+       Mat blurred = new Mat();
+       Imgproc.GaussianBlur(inverted, blurred, new Size(21, 21), 0);
+
+       Mat invertedBlur = new Mat();
+       Core.bitwise_not(blurred, invertedBlur);
+
+       Mat sketch = new Mat();
+       Core.divide(gray, invertedBlur, sketch, 256.0);
+
+       Imgcodecs.imwrite(selectedfile.getAbsolutePath(), sketch);
+       System.out.println("✅ Sketch effect saved to " + selectedfile.getAbsolutePath());
+		
+   }
+
+   public static void applyCartoonPrepEffect() {
+	
+       Mat img = Imgcodecs.imread(selectedfile.getAbsolutePath());
+       if (img.empty()) {
+           System.out.println("❌ Could not load image");
+           return;
+       }
+
+       Imgproc.resize(img, img, new Size(512, 512));
+
+       Mat filtered = img.clone();
+       for (int i = 0; i < 7; i++) {
+           Mat temp = new Mat();
+           Imgproc.bilateralFilter(filtered, temp, 9, 75, 75);
+           filtered = temp;
+       }
+
+       Imgcodecs.imwrite(selectedfile.getAbsolutePath(), filtered);
+       System.out.println("✅ Cartoon prep effect saved to " + selectedfile.getAbsolutePath());
+	
+   }
+
+   public static void applySobelEdge() {
+		
+       Mat gray = Imgcodecs.imread(selectedfile.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
+       if (gray.empty()) {
+           System.out.println("❌ Could not load image");
+           return;
+       }
+
+       Mat gradX = new Mat();
+       Mat gradY = new Mat();
+       Imgproc.Sobel(gray, gradX, CvType.CV_16S, 1, 0);
+       Imgproc.Sobel(gray, gradY, CvType.CV_16S, 0, 1);
+
+       Mat absX = new Mat();
+       Mat absY = new Mat();
+       Core.convertScaleAbs(gradX, absX);
+       Core.convertScaleAbs(gradY, absY);
+
+       Mat sobelOutput = new Mat();
+       Core.addWeighted(absX, 0.5, absY, 0.5, 0, sobelOutput);
+
+       Imgcodecs.imwrite(selectedfile.getAbsolutePath(), sobelOutput);
+       System.out.println("✅ Sobel edge effect saved to " + selectedfile.getAbsolutePath());
+	
+   }
+		
+
 
 }
