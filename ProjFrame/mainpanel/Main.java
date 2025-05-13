@@ -1,5 +1,7 @@
 package mainpanel;
 
+
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Color;
 import javax.swing.UIManager;
@@ -58,9 +60,11 @@ import mainpanel.DataBase;
 
 
 //bu yorum satırı olmicak 
-/*import org.opencv.core.*;
+/*
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Core;
 */
 
 import java.awt.BorderLayout;
@@ -255,10 +259,98 @@ public class Main extends JFrame {
 				applySobelEdge("resources/images/image3.jpg", "output/sobel.jpg")
 			);
 
+			// Color Inversion butonu
+			JButton inversionButton = new JButton("Apply Color Inversion");
+			inversionButton.setMinimumSize(new Dimension(200, 50));
+			inversionButton.setMaximumSize(new Dimension(200, 50));
+			inversionButton.setPreferredSize(new Dimension(200, 50));
+			inversionButton.addActionListener(evt ->
+				applyColorInversion("resources/images/image4.jpg", "output/inverted.jpg")
+			);
+
+			// Color Tint Effect butonu
+			JButton tintButton = new JButton("Apply Color Tint Effect");
+			tintButton.setMinimumSize(new Dimension(200, 50));
+			tintButton.setMaximumSize(new Dimension(200, 50));
+			tintButton.setPreferredSize(new Dimension(200, 50));
+			tintButton.addActionListener(evt ->
+				applyColorTintEffect("resources/images/image1.jpg", "output/tinted_image.png")
+			);
+
+			
+
+
+			// Vignette Effect butonu
+			JButton vignetteButton = new JButton("Apply Vignette Effect");
+			vignetteButton.setMinimumSize(new Dimension(200, 50));
+			vignetteButton.setMaximumSize(new Dimension(200, 50));
+			vignetteButton.setPreferredSize(new Dimension(200, 50));
+			vignetteButton.addActionListener(evt ->
+				applyVignetteEffect("resources/images/image1.jpg", "output/vignette_image.png")
+			);
+			
+			
+			// Motion Blur Effect butonu
+			JButton motionBlurButton = new JButton("Apply Motion Blur Effect");
+			motionBlurButton.setMinimumSize(new Dimension(200, 50));
+			motionBlurButton.setMaximumSize(new Dimension(200, 50));
+			motionBlurButton.setPreferredSize(new Dimension(200, 50));
+			motionBlurButton.addActionListener(evt ->
+				applyMotionBlurEffect("resources/images/image1.jpg", "output/motion_blurred_image.png", 15)
+			);
+
+
+
+
+			// Pixelation Effect label ve fieldı
+			JLabel pixLabel = new JLabel("Pixel Size:");
+			pixLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+			JTextField pixField = new JTextField("32");
+			pixField.setMaximumSize(new Dimension(300, 35));
+			pixField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+			// Pixelation Effect butonu
+			JButton pixelButton = new JButton("Apply Pixelation Effect");
+
+			pixelButton.setMinimumSize(new Dimension(200, 50));
+			pixelButton.setMaximumSize(new Dimension(200, 50));
+			pixelButton.setPreferredSize(new Dimension(200, 50));
+			pixelButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+			pixelButton.addActionListener(evt -> {
+				try {
+					int size = Integer.parseInt(pixField.getText().trim());
+					if (size <= 0) throw new NumberFormatException();
+
+					applyPixelEffect(
+						"resources/images/image1.jpg",
+						"output/pixelated.png"/* 
+						,new Size(size, size)*/
+					);
+
+					JOptionPane.showMessageDialog(null, "✅ Piksel efekti başarıyla uygulandı!");
+
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "Lütfen geçerli bir pozitif tam sayı girin.");
+				}
+			});
+
+
 			// Butonları panele ekle
 			functionPanel.add(sketchButton);
 			functionPanel.add(cartoonButton);
 			functionPanel.add(sobelButton);
+			functionPanel.add(inversionButton);
+			functionPanel.add(tintButton);
+			functionPanel.add(vignetteButton);
+			functionPanel.add(motionBlurButton);
+
+			
+			functionPanel.add(pixLabel);
+			functionPanel.add(pixField);
+			functionPanel.add(pixelButton);
+			
 
 			functionPanel.revalidate();
 			functionPanel.repaint();
@@ -783,7 +875,193 @@ public class Main extends JFrame {
 		}
 	}
 
-		
+	public void applyColorInversion(String inputPath, String outputPath) {
+		/* 
+		Mat img = Imgcodecs.imread(inputPath);
+		if (img.empty()) {
+			System.out.println("❌ Could not load image from: " + inputPath);
+			return;
+		}
+
+		Mat inverted = new Mat();
+		Core.bitwise_not(img, inverted);
+
+		boolean success = Imgcodecs.imwrite(outputPath, inverted);
+		if (success) {
+			System.out.println("✅ Color inversion saved to " + outputPath);
+		} else {
+			System.out.println("❌ Failed to save color inversion.");
+		}
+			*/
+
+			//aşağısı try catch li ama kaydetme kısmı galiba try catchi hangisini beğenirseniz onu kullanabilirsiniz
+
+		/*  
+		try {
+			Mat img = Imgcodecs.imread(inputPath);
+			if (img.empty()) {
+				System.out.println("❌ Could not load image from: " + inputPath);
+				JOptionPane.showMessageDialog(null, "Resim yüklenemedi: " + inputPath, "Hata", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			Mat inverted = new Mat();
+			Core.bitwise_not(img, inverted);
+
+			boolean success = Imgcodecs.imwrite(outputPath, inverted);
+			if (success) {
+				System.out.println("✅ Color inversion saved to " + outputPath);
+				JOptionPane.showMessageDialog(null, "Ters renkli resim başarıyla kaydedildi:\n" + outputPath);
+			} else {
+				System.out.println("❌ Failed to save color inversion.");
+				JOptionPane.showMessageDialog(null, "Resim kaydedilemedi!", "Hata", JOptionPane.ERROR_MESSAGE);
+			}
+
+		} catch (Exception e) {
+			System.err.println("❌ applyColorInversion sırasında bir hata oluştu:");
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Bir hata oluştu:\n" + e.getMessage(), "Hata", JOptionPane.ERROR_MESSAGE);
+		}
+		*/
+	}
+
+	public static void applyColorTintEffect(String inputPath, String outputPath) {
+		/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        if (src.empty()) {
+            System.out.println("❌ Could not load image");
+            return;
+        }
+
+        Mat tinted = new Mat();
+        src.convertTo(tinted, -1, 1, 0); // Copy
+
+        // Mavi ton ekle (mavi kanalını artır)
+        Core.add(tinted, new Scalar(50, 0, 0), tinted); // BGR: (Blue, Green, Red)
+
+        boolean success = Imgcodecs.imwrite(outputPath, tinted);
+        if (success) {
+            System.out.println("✅ Blue-tinted image saved!");
+        } else {
+            System.out.println("❌ Failed to save blue-tinted image.");
+        }
+		*/
+    }
+
+	public static void applyPixelEffect(String inputPath, String outputPath /* , Size pixelSize*/) {
+		/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        if (src.empty()) {
+            System.out.println("❌ Could not load image");
+            return;
+        }
+
+        // Küçült - sonra tekrar büyüt (piksel etkisi)
+        Mat tmp = new Mat();
+        Imgproc.resize(src, tmp, pixelSize, 0, 0, Imgproc.INTER_LINEAR);
+
+        Mat pixelated = new Mat();
+        Imgproc.resize(tmp, pixelated, src.size(), 0, 0, Imgproc.INTER_NEAREST);
+
+        boolean success = Imgcodecs.imwrite(outputPath, pixelated);
+        if (success) {
+            System.out.println("✅ Pixelation effect saved to " + outputPath);
+        } else {
+            System.out.println("❌ Failed to save pixelated image.");
+        }
+		*/
+    }
+
+
+
+    //bu kısım gerekli vignette efekti için
+	/*
+	public static Mat createVignetteMask(Mat src) {
+        int rows = src.rows();
+        int cols = src.cols();
+
+        Mat kernelX = Imgproc.getGaussianKernel(cols, cols / 2.0);
+        Mat kernelY = Imgproc.getGaussianKernel(rows, rows / 2.0);
+        Mat kernel = new Mat();
+        Core.gemm(kernelY, kernelX.t(), 1, new Mat(), 0, kernel);
+
+        Core.normalize(kernel, kernel, 0, 1, Core.NORM_MINMAX);
+        Mat mask = new Mat();
+        List<Mat> channels = new ArrayList<>();
+        for (int i = 0; i < 3; i++) channels.add(kernel);
+        Core.merge(channels, mask);
+        return mask;
+    }
+	*/
+
+	 public static void applyVignetteEffect(String inputPath, String outputPath) {/* 
+        Mat src = Imgcodecs.imread(inputPath);
+        if (src.empty()) {
+            System.out.println("❌ Could not load image");
+            return;
+        }
+
+        Mat mask = createVignetteMask(src);
+        Mat vignette = new Mat();
+        Core.multiply(src, mask, vignette, 1, CvType.CV_8UC3);
+
+        boolean success = Imgcodecs.imwrite(outputPath, vignette);
+        if (success) {
+            System.out.println("✅ Vignette effect saved to " + outputPath);
+        } else {
+            System.out.println("❌ Failed to save vignette image.");
+        }
+		*/
+    }
+
+
+
+
+
+	public static void applyMotionBlurEffect(String inputPath, String outputPath, int kernelSize) {
+		/* 
+		Mat src = null;
+		try {
+			src = Imgcodecs.imread(inputPath);
+			if (src.empty()) {
+				System.out.println("❌ Could not load image");
+				return;
+			}
+		} catch (Exception e) {
+			System.out.println("❌ Error loading image: " + e.getMessage());
+			return;
+		}
+
+		// Kernel oluşturuluyor
+		Mat kernel = Mat.zeros(kernelSize, kernelSize, CvType.CV_32F);
+		for (int i = 0; i < kernelSize; i++) {
+			kernel.put(i, i, 1.0 / kernelSize);
+		}
+
+		Mat dst = new Mat();
+		try {
+			// Büyütülmüş kernel'i resme uyguluyoruz
+			Imgproc.filter2D(src, dst, -1, kernel);
+		} catch (Exception e) {
+			System.out.println("❌ Error applying motion blur: " + e.getMessage());
+			return;
+		}
+
+		// Çıkış dosyasını kaydetme işlemi
+		try {
+			boolean success = Imgcodecs.imwrite(outputPath, dst);
+			if (success) {
+				System.out.println("✅ Motion blur applied and saved to " + outputPath);
+			} else {
+				System.out.println("❌ Failed to save motion blurred image.");
+			}
+		} catch (Exception e) {
+			System.out.println("❌ Error saving image: " + e.getMessage());
+		}
+		*/
+	}
+	
+	
 
 
 
