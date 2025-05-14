@@ -1,8 +1,6 @@
 package mainpanel;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -110,6 +108,7 @@ public abstract class DataBaseCore {   // Dosya oluşturur veya siler
 
         String dosAdi = input.nextLine();
 
+        input.close();
         return dosAdi;
     }
 	
@@ -121,7 +120,9 @@ class ImgDataBase extends DataBaseCore{
 class FunctionDataBase extends DataBaseCore{
 	public void Parse(Path filepath){
 		try {
-			this.Parse(new Scanner(new File(filepath.toString())).useDelimiter("\\Z").next());
+			Scanner sc = new Scanner(new File(filepath.toString()));
+			this.Parse(sc.useDelimiter("\\Z").next());
+			sc.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

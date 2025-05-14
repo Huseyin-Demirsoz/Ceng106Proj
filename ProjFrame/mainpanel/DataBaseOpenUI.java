@@ -62,14 +62,8 @@ public class DataBaseOpenUI {
 		gbc_btnCreate.gridy = 2;
 		dbPane.add(btnCreate, gbc_btnCreate);
 		//
-		btnCreate.addActionListener(btn ->{
+		btnCreate.addActionListener(_ ->{
 			File file = database.makeDB(textField.getText());
-			int j = 0;
-			// TODO BAD CODE
-			for (int i = 0; database.tableObj.get(i).file != file && i < 100; i++) {
-				j++;
-			}
-			// DataBase.tableObj.get(j).Write("asdf \n");
 
 			filelistmodel.addElement(filelistmodel.addfile(file));
 

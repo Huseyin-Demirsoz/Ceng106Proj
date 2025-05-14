@@ -20,7 +20,6 @@ public class FileChooserUI {
 			try{
 				//file selected -> get path -> try to pull string until EOF(\\Z)
 				file = new File(xfile_chooser.getSelectedFile().getAbsolutePath());
-				String str ="A/B/C/D";
 				
 				
 				/*try {

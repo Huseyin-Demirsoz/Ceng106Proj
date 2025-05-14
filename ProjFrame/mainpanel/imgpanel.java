@@ -7,6 +7,7 @@ import java.awt.Image;
 import javax.swing.JPanel;
 
 public final class imgpanel extends JPanel{
+	private static final long serialVersionUID = 5805543053359120595L;
 	Image img;
 	protected void paintComponent(Graphics g) {
             super.paintComponent(g);
