@@ -51,7 +51,7 @@ public class Main extends JFrame {
 	static File selectedfile ;//TODO
 	
 	static {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        System.load("C:\\Users\\my\\Documents\\NewOpenCV\\opencv\\build\\java\\x64\\opencv_java4110.dll");
     }
 	/*
 	The main function dispatches the public constructor as a main thread //TODO ingilizce
@@ -259,18 +259,18 @@ public class Main extends JFrame {
 		});
 		
 		mntmLight.addActionListener(_ -> {
-    		contentPane.setBackground(Color.WHITE);
-    		updateComponentColors(contentPane, Color.BLACK, Color.WHITE);
+    		contentPane.setBackground(new Color(133,47,204));
+    		updateComponentColors(contentPane, Color.BLACK, new Color(150,150,150));
 		});
 
 		mntmDark.addActionListener(_ -> {
-    		contentPane.setBackground(Color.DARK_GRAY);
-    		updateComponentColors(contentPane, Color.WHITE, Color.DARK_GRAY);
+    		contentPane.setBackground(new Color(39,6,66));
+    		updateComponentColors(contentPane, Color.WHITE, new Color(39,6,66));
 		});
 
 
 		mntmMedium.addActionListener(_ -> {
-    		contentPane.setBackground(new Color(200, 200, 200));
+    		contentPane.setBackground(new Color(72,22,112));
     		updateComponentColors(contentPane, Color.BLACK, new Color(200, 200, 200));
 		});
 	}
