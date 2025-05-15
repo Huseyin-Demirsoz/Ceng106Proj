@@ -227,13 +227,7 @@ class FunctionDataBase extends DataBaseCore{
 											in0 = imgpassingbuff.pop();
 										}
 										//dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, in0, Imgproc.COLOR_RGB2GRAY);// This is not used because it collapses channels 3 to 1
-										List<Mat> color = new ArrayList<Mat>(3);
-										Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2HSV);
-										Core.split(dest, color);
-										color.set(1, color.get(1).setTo(new Scalar(0)));
-										Core.merge(color, dest);
-										Imgproc.cvtColor(dest, dest, Imgproc.COLOR_HSV2RGB);
+										dest = ToGray.wMat(in0);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -250,7 +244,7 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = in0; // DEBUG NO-OP function
+										dest = Dominant_Color.wMat(in0); // DEBUG NO-OP function
 										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);

@@ -78,7 +78,7 @@ public class Main extends JFrame {
 		ImgDataBase database = new ImgDataBase();
 		//TODO DEBUG
 		FunctionDataBase functions = new FunctionDataBase();
-		functions.Parse(Paths.get("/home/hd/Desktop/projtestfile.txt"));// TODO DEBUG file
+		//functions.Parse(Paths.get("/home/hd/Desktop/projtestfile.txt"));// TODO DEBUG file
 		this.contentPane = new JPanel();
 		
 		
