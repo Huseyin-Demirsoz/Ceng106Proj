@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionListener;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -44,21 +45,29 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	static JPanel contentPane;
 	static File selectedfile ;//TODO
+	static int selectedindex;
+	static Connection conn;
 	
 	static {
-        System.load("C:\\Users\\my\\Documents\\NewOpenCV\\opencv\\build\\java\\x64\\opencv_java4110.dll");
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 	/*
 	The main function dispatches the public constructor as a main thread //TODO ingilizce
 	Main fonksiyonu "main"den public constructor programın ana fonksiyonu olarak açılır
 	 */
 	public static void main(String[] args) {
-		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -69,10 +78,77 @@ public class Main extends JFrame {
 				}
 			}
 		});
+		/*
+		if(conn != null) {
+			
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		*/
 	}
 	
+	public static void connect() {
+        // connection string
+		 conn = null;
+		try {
+			var url = "jdbc:sqlite:database.db";
+			
+			try {
+				conn = DriverManager.getConnection(url);
+				System.out.println("Connection to SQLite has been established.");
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			Statement stmt = conn.createStatement();
+			try {
+				//stmt.execute("CREATE TABLE Tablex(file varchar(255),inder integer);");
+			}catch(Exception e){
+				
+			}
+			/*
+			for(int i =0;i<10;i++) {
+				PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Tablex(filepath,name) VALUES(?,?)");
+				pstmt.setString(1, "OK");
+				pstmt.setInt(2, 5);
+				pstmt.executeUpdate();
+			}
+			*/
+			//stmt.execute("DROP TABLE Tablex");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM sqlite_master WHERE type='table';");
+			while(rs.next()) {
+				System.out.println("OK: "+rs.getString(2));
+				//stmt.execute("DROP TABLE ");
+				//System.out.println("Num: "+rs.getInt("inder"));
+			}
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.exit(0);
+    }
 	
 	public Main() {
+		
+		connect();
+		Statement stmt=null;
+		try {
+			stmt = conn.createStatement();
+			try {
+				stmt.execute("CREATE TABLE Tablex(filepath varchar(255),name varchar(255));");
+			}catch(Exception e){
+				
+			}
+			//stmt.execute("DROP TABLE Tablex");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		
 		JTextArea textarea = new JTextArea ();
 		ImgDataBase database = new ImgDataBase();
@@ -117,36 +193,48 @@ public class Main extends JFrame {
 		//TODO ingilizce
 		//super_list_1 is the list of the "list elements" that get displayed 
 		//for each file for example the functions and image path contained in a database
-		List<JList<FileListDataModel>> super_list_1 = new ArrayList<JList<FileListDataModel>>();
+		//List<JList<FileListDataModel>> super_list_1 = new ArrayList<JList<FileListDataModel>>();
 		
 		//sets the JList in the project view tab to the contents of the selected file
-		FileListDataModel filelistmodel = new FileListDataModel();
-		JList<FileListDataModel> list = new JList(filelistmodel);
+		//DBListDataModel dblistmodel = new DBListDataModel();
+		//FileListDataModel filelistmodel = new FileListDataModel();
+		DefaultListModel<String> activefiles = new DefaultListModel<String>();
+		DefaultListModel<String> tables = new DefaultListModel<String>();
+		JList<String> sublist = new JList<String>(activefiles);
+		JList<String> list = new JList<String>(tables);
 		imgpanel mainImage = new imgpanel();
 		list.addListSelectionListener(_ -> {
 			//Listenin seçim ihtiyaçları fazladan oduğundan yeni dosyaya atılmıştır
-			selectedfile = LeftPanelList.listListener(selectedfile,filelistmodel,list,scrollPane_1,super_list_1,mainImage,this.contentPane);
+			
+			
+			 LeftPanelList.listListener(list,scrollPane_1,activefiles);
 			//Text editörde gözükmesi için seçilenin okunup yazılmasını sağlar
-			if (selectedfile.getName().endsWith(".txt") || selectedfile.getName().endsWith(".fdb")) {
-				contentPane.remove(mainImage);
-				String text;
-				try {
-					Scanner sc = new Scanner(selectedfile);
-					text = sc.useDelimiter("\\Z").next();
-					sc.close();
-					textarea.setText(text);
-				} catch (FileNotFoundException er) {
-					textarea.setText("");
-				} catch(java.util.NoSuchElementException r) {
+			
+			 sublist.addListSelectionListener(_ ->{
+				FileListListener.listListener(scrollPane_1,sublist,mainImage,this.contentPane,activefiles);
+				if (selectedfile != null &&(selectedfile.getName().endsWith(".txt") || selectedfile.getName().endsWith(".fdb"))) {
+					contentPane.remove(mainImage);
+					String text;
+					try {
+						Scanner sc = new Scanner(selectedfile);
+						text = sc.useDelimiter("\\Z").next();
+						sc.close();
+						textarea.setText(text);
+					} catch (FileNotFoundException er) {
+						textarea.setText("");
+					} catch(java.util.NoSuchElementException r) {
+						textarea.setText("");
+					}
+					contentPane.repaint();
+				}else {
 					textarea.setText("");
 				}
-				contentPane.repaint();
-			}else {
-				textarea.setText("");
-			}
+			});
 		});
 		scrollPane.setViewportView(list);
+		scrollPane_1.setViewportView(sublist);
 		
+		/*
 		//input klasöründeki tüm dosyaları listeye almak için
 		database.makeDB();
 		database.readDBfromFolder();
@@ -161,7 +249,41 @@ public class Main extends JFrame {
 			projlistmodel.getLast().add(0,database.tableObj.get(i).file.getName());
 			super_list_1.getLast().setModel(projlistmodel.getLast());
 		}
+		*/
 		
+		try {
+			Statement stmt2 = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM sqlite_master WHERE type='table';");
+			while(rs.next()) {
+				String DBname =rs.getString(2);
+				System.out.println("OK: "+DBname);
+				tables.addElement(DBname);
+				
+				//super_list_1.addLast(new JList<FileListDataModel>());
+				ResultSet filesdb = stmt2.executeQuery("SELECT * FROM "+ DBname +";");
+				while(filesdb.next()) {
+					File filex =new File(filesdb.getString(2));
+					activefiles.addElement(filex.getAbsolutePath());
+					//super_list_1.getLast().add(filex.getName(), null);
+					//super_list_1.getLast().add( filesdb.getString("name"));
+					//filelistmodel.addfile(filex);
+					//dblistmodel.addfile(DBname, filex);
+				}/*
+				System.out.println("OK: ");
+				List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
+				
+				projlistmodel.addLast(new DefaultListModel<Object>());
+				projlistmodel.getLast().add(0,DBname);
+				super_list_1.getLast().setModel(projlistmodel.getLast());
+				*/
+				//stmt.execute("DROP TABLE ");
+				//System.out.println("Num: "+rs.getInt("inder"));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 		
 		
 		
@@ -179,7 +301,7 @@ public class Main extends JFrame {
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mnFile.add(mntmOpen);
 		mntmOpen.addActionListener(_ ->{
-			FileChooserUI.open(filelistmodel, super_list_1);
+			FileChooserUI.open(tables, activefiles);
 		});
 		
 		//TODO kullanılmayan buton
@@ -187,10 +309,10 @@ public class Main extends JFrame {
 		mnFile.add(mntmSave);
 		
 		//Yeni DataBase açılım butonu
-		JMenuItem mntmNewDB = new JMenuItem("New DataBase");
+		JMenuItem mntmNewDB = new JMenuItem("New Project");
 		mnFile.add(mntmNewDB);
 		mntmNewDB.addActionListener(_ ->{
-			DataBaseOpenUI.open(this, database, filelistmodel, super_list_1, this.contentPane);
+			DataBaseOpenUI.open(this, this.contentPane,tables);
 		});
 		//TODO yorum
 		//tema kısmı halloldu galiba

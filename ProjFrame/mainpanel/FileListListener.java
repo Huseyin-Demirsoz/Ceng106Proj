@@ -4,38 +4,25 @@ import java.awt.BorderLayout;
 import java.awt.Image;
 import java.io.File;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
 import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
 
-public class LeftPanelList {
-	public static void listListener(JList<String> list,
-			JScrollPane scrollPane_1,DefaultListModel<String> activefiles) {
-		//selectedfile = filelistmodel.getFileAt(list.getSelectedIndex(),0);
-		Main.selectedindex=list.getSelectedIndex();
-		//sublist.removeAll();
-		activefiles.removeAllElements();
-		try {
-			Statement stmt = Main.conn.createStatement();
-			ResultSet filesdb = stmt.executeQuery("SELECT * FROM "+ list.getSelectedValue() +";");
-			while(filesdb.next()) {
-				File file =new File(filesdb.getString("filepath"));
-				activefiles.addElement(file.getAbsolutePath());
-			}
-		}catch(SQLException e) {
-			//TODO error
+public class FileListListener {
+	public static void listListener(JScrollPane scrollPane_1,JList<String> sublist,imgpanel mainImage,JPanel contentPane,DefaultListModel<String> activefiles) {
+		if(sublist.getSelectedIndex()+1>0) {
+			Main.selectedfile = new File(activefiles.get(sublist.getSelectedIndex()));
+		}else {
+			return;
 		}
-		/*///////////////////////
-		if(selectedfile.getName().endsWith(".jpg") || selectedfile.getName().endsWith(".png")){
-		Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(selectedfile.getAbsolutePath());
+		if(Main.selectedfile.getName().endsWith(".jpg") || Main.selectedfile.getName().endsWith(".png")){
+		Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(Main.selectedfile.getAbsolutePath());
 		Image bufImage = HighGui.toBufferedImage(image_tmp);
 		//TODO
 		//mainImage.setimg(bufImage);
@@ -63,7 +50,6 @@ public class LeftPanelList {
 		
 		mainImage.setBounds(mainImage.getX(),mainImage.getY(),scalex,scaley);
 		*/
-		/*////////////////////
 		mainImage.setimg(bufImage.getScaledInstance(
 				scalex
 				//bufImage.getWidth(null)
@@ -71,11 +57,10 @@ public class LeftPanelList {
 				//bufImage.getHeight(null)
 				,Image.SCALE_SMOOTH ));
 		}
-		*/
 		//this.contentPane.add(mainImage, BorderLayout.CENTER);
-		/*
+		
 		mainImage.updateUI();
-		*/
+		
 		//mainImage.imageUpdate(bufImage,FRAMEBITS, mainImage.getX(), mainImage.getY(), scalex, scaley);
 		/*
 		mainImage.addComponentListener(new ComponentListener() {
@@ -105,12 +90,9 @@ public class LeftPanelList {
 			public void componentShown(ComponentEvent e) {}
 			public void componentHidden(ComponentEvent e) {}
 		});*/
-		/*///////////////////////////
 		image_tmp.release();
 		bufImage.flush();
 		}
-		ApplyFunctionUI.selectedfile = selectedfile;
-		return selectedfile;
-		*/
+		ApplyFunctionUI.selectedfile = Main.selectedfile;
 	}
 }

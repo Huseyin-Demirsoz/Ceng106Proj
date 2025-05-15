@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 public class DataBaseOpenUI {
-	public static void open(JFrame mainf,ImgDataBase database,FileListDataModel filelistmodel, List<JList<FileListDataModel>> super_list_1,JPanel contentPane) {
+	public static void open(JFrame mainf,JPanel contentPane,DefaultListModel<String> tables){//,ImgDataBase database,FileListDataModel filelistmodel, List<JList<FileListDataModel>> super_list_1) {
 		//TODO initializes new database 
 		//JFrame newdbframe = new JFrame ("MyPanel");
 		JDialog newdbframe = new JDialog(mainf, "Create a new database", JDialog.ModalityType.DOCUMENT_MODAL);
@@ -63,17 +63,20 @@ public class DataBaseOpenUI {
 		dbPane.add(btnCreate, gbc_btnCreate);
 		//
 		btnCreate.addActionListener(_ ->{
-			File file = database.makeDB(textField.getText());
-
-			filelistmodel.addElement(filelistmodel.addfile(file));
+			tables.addElement(DataBaseCore.makeProjTable(textField.getText()));
+			
+			/*
+			filelistmodel.addElement(database.makeProjTable(textField.getText()));
+			//filelistmodel.addElement(filelistmodel.addfile(file));
 
 			super_list_1.addLast(new JList<FileListDataModel>());
 
 			List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
 
 			projlistmodel.addLast(new DefaultListModel<Object>());
-			projlistmodel.getLast().add(0, file.getName());
+			projlistmodel.getLast().add(0, filelistmodel.lastElement());
 			super_list_1.getLast().setModel(projlistmodel.getLast());
+			*/
 		});
 		
 		JRadioButton rdbtnNewRadioButton = new JRadioButton("image");

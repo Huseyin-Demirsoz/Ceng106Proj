@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.stream.Collectors;
+
+import javax.swing.JOptionPane;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -20,8 +24,29 @@ import org.opencv.imgproc.Imgproc;
 
 
 public abstract class DataBaseCore {   // Dosya oluşturur veya siler
-
+	
     public ArrayList<Table> tableObj; // Referans dizisi de olabilir.
+    
+    public static String makeProjTable(String name){
+    	System.out.println("ok");
+    	String nam ="";
+    	
+    	for (String str : name.split("[^a-z]+")) {
+    		nam= nam+str;
+    	}
+    	if(nam == "") {
+    		JOptionPane.showMessageDialog(null, "bad name");
+    	}
+    	try {
+			Statement stmt = Main.conn.createStatement();
+			stmt.execute("CREATE TABLE "+name+"(filepath varchar(255),name varchar(255));");
+		}catch(SQLException e){
+			
+		}
+    	return nam;
+    }
+    
+    
     
     public void makeDB() {
     	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
@@ -44,6 +69,7 @@ public abstract class DataBaseCore {   // Dosya oluşturur veya siler
     	*/
     	//Creates new folders
     	//TODO: TEST ON WINDOWS
+		
     	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
     		new File("input").mkdirs();
     		new File("output").mkdirs();
@@ -66,11 +92,12 @@ public abstract class DataBaseCore {   // Dosya oluşturur veya siler
 		
 		//Could error from not initialising the list !! TODO
 		//tableObj = new ArrayList<>();
+		
         tableObj.add( new Table(file,"input/" + file.getName(),"output/" + file.getName()));
         
         return file;
     }
-    public void readDBfromFolder(/*get path?*/) {
+    public void readDBfromFolder() {
     	//programımız ilk başladığında input klasörünün içindeki tüm dosyaları okuması için
     	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
     		new File("input").mkdirs();

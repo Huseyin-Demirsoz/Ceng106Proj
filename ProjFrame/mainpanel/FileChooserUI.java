@@ -1,6 +1,8 @@
 package mainpanel;
 
 import java.io.File;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 
 public class FileChooserUI {
-	public static void open(FileListDataModel filelistmodel, List<JList<FileListDataModel>> super_list_1){
+	public static void open(DefaultListModel<String> tables, DefaultListModel<String> activefiles) {//DBListDataModel dblistmodel, List<JList<FileListDataModel>> super_list_1){
 		//Opens the file chooser provided by swing
 		JFileChooser xfile_chooser= new JFileChooser();
 		int response =xfile_chooser.showOpenDialog(null);
@@ -44,7 +46,15 @@ public class FileChooserUI {
 			}
 			//filelistmodel.addfile(file);
 			//TODO: Big 
-			filelistmodel.addElement(filelistmodel.addfile(file));
+			try {
+				PreparedStatement pstmt = Main.conn.prepareStatement("INSERT INTO "+tables.getElementAt(Main.selectedindex)+"(filepath,name) VALUES(?,?)");
+				pstmt.setString(1, file.getAbsolutePath());
+				pstmt.setString(2, file.getName());
+				pstmt.executeUpdate();
+			}catch(SQLException e) {
+				//TODO error
+			}
+			/*dblistmodel.addElement(dblistmodel.addfile(Main.selectedindex,file));
 			
 			super_list_1.addLast(new JList<FileListDataModel>());
 			
@@ -52,7 +62,7 @@ public class FileChooserUI {
 			
 			projlistmodel.addLast(new DefaultListModel<Object>());
 			projlistmodel.getLast().add(0,file.getName());
-			super_list_1.getLast().setModel(projlistmodel.getLast());
+			super_list_1.getLast().setModel(projlistmodel.getLast());*/
 			//projlistmodel=null;
 			//System.gc();
 			
