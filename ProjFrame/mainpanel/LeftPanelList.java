@@ -88,6 +88,7 @@ public class LeftPanelList {
 		image_tmp.release();
 		bufImage.flush();
 		}
+		ApplyFunctionUI.selectedfile = selectedfile;
 		return selectedfile;
 	}
 }
