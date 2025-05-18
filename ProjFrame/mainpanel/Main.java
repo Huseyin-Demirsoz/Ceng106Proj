@@ -57,6 +57,8 @@ public class Main extends JFrame {
 	static File selectedfile ;//TODO
 	static int selectedindex;
 	static Connection conn;
+
+
 	
 	/*static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -99,8 +101,8 @@ public class Main extends JFrame {
         // connection string
 		 conn = null;
 		try {
-			var url = "jdbc:sqlite:database.db";
-			
+			//var url = "jdbc:sqlite:database.db";
+			String url = "jdbc:sqlite:C:\\Users\\my\\Documents\\SQL Lite for Java\\database.db";
 			try {
 				conn = DriverManager.getConnection(url);
 				System.out.println("Connection to SQLite has been established.");
@@ -111,7 +113,7 @@ public class Main extends JFrame {
 			try {
 				//stmt.execute("CREATE TABLE Tablex(file varchar(255),inder integer);");
 			}catch(Exception e){
-				
+
 			}
 			/*
 			for(int i =0;i<10;i++) {
@@ -132,7 +134,10 @@ public class Main extends JFrame {
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			System.out.println(e.getMessage());
+			//e.printStackTrace();
+
 		}
 		//System.exit(0);
     }
@@ -417,9 +422,11 @@ public class Main extends JFrame {
 		});
 
 		textField.setBounds(120,120,30,10);  // Text Box boyutları
-		contentPane.add(textField);
+		//contentPane.add(textField);
+		programbar.add(textField);
 
-		contentPane.add(button);
+		//contentPane.add(button);
+		programbar.add(button);
 		button.setBounds(150,120,15,10);  // Button boyutları
 
 

@@ -9,32 +9,32 @@ public class ApplyChosenFilter {
 
             case "Sobel":
 
-                ApplyFunctionUI.applySobelEdge("C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme");
+                ApplyFunctionUI.applySobelEdge(Main.selectedfile.getAbsolutePath(), "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme");
 
                 break;
 
             case "SketchEffect":
 
-                ApplyFunctionUI.applySketchEffect("C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme");
+                ApplyFunctionUI.applySketchEffect(Main.selectedfile.getAbsolutePath(), "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme");
 
                 break;
 
             case "BrightAndContrastAdjustment":
 
-                ApplyFunctionUI.adjustBrightnessContrast("C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", 50, 50);
+                ApplyFunctionUI.adjustBrightnessContrast(Main.selectedfile.getAbsolutePath(), "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", 50, 50);
 
                 break;
 
             case "Cartoon":
 
-                ApplyFunctionUI.applyCartoonPrepEffect("C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme");
+                ApplyFunctionUI.applyCartoonPrepEffect(Main.selectedfile.getAbsolutePath(), "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme");
 
 
                 break;
 
             case "DominantColor":
 
-                ApplyFunctionUI.applyDominantColorKMeans("C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", 5);
+                ApplyFunctionUI.applyDominantColorKMeans(Main.selectedfile.getAbsolutePath(), "C:\\Users\\my\\Documents\\Filter NLP Data Set\\Deneme", 5);
 
 
                 break;
