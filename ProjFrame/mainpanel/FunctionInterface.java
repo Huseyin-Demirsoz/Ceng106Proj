@@ -522,7 +522,7 @@ class ColorTintEffect implements FunctionInterface{
 	    return tinted;
 	}
 	
-}
+}/*
 class MedianBlur implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
@@ -538,6 +538,6 @@ class MedianBlur implements FunctionInterface{
 	}
 	
 }
-
+*/
 
 

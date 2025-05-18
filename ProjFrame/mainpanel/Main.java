@@ -1,6 +1,4 @@
 package mainpanel;
-
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -60,9 +58,13 @@ public class Main extends JFrame {
 	static int selectedindex;
 	static Connection conn;
 	
-	static {
+	/*static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    }
+    }*/
+
+	static{
+		System.load("C:\\Users\\my\\Documents\\NewOpenCV\\opencv\\build\\java\\x64\\opencv_java4110.dll");
+	}
 	/*
 	The main function dispatches the public constructor as a main thread //TODO ingilizce
 	Main fonksiyonu "main"den public constructor programın ana fonksiyonu olarak açılır
@@ -89,8 +91,10 @@ public class Main extends JFrame {
 			}
 		}
 		*/
+
+
 	}
-	
+
 	public static void connect() {
         // connection string
 		 conn = null;
@@ -124,7 +128,7 @@ public class Main extends JFrame {
 				//stmt.execute("DROP TABLE ");
 				//System.out.println("Num: "+rs.getInt("inder"));
 			}
-			
+
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -132,9 +136,16 @@ public class Main extends JFrame {
 		}
 		//System.exit(0);
     }
-	
-	public Main() {
-		
+
+	public Main() throws Exception {
+
+		List<FilterClassifier.Document> docDataSet = Documentation.DocumateTheWords(); // İlk model eğitimi için önceden işlenmiş data set'ini text ve albel olarak ayırıyoruz.
+
+		FilterClassifier.NaiveBayesModel obj = new InheritFilterClassifier(); // Polymorphism
+
+		obj.train(docDataSet);
+//NLP Eğitimi yapılır.
+
 		connect();
 		Statement stmt=null;
 		try {
@@ -148,7 +159,7 @@ public class Main extends JFrame {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		
 		JTextArea textarea = new JTextArea ();
 		ImgDataBase database = new ImgDataBase();
@@ -250,7 +261,7 @@ public class Main extends JFrame {
 			super_list_1.getLast().setModel(projlistmodel.getLast());
 		}
 		*/
-		
+
 		try {
 			Statement stmt2 = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM sqlite_master WHERE type='table';");
@@ -284,7 +295,7 @@ public class Main extends JFrame {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		
 		
 		//The NavBar
@@ -395,7 +406,30 @@ public class Main extends JFrame {
     		contentPane.setBackground(new Color(72,22,112));
     		updateComponentColors(contentPane, Color.BLACK, new Color(200, 200, 200));
 		});
+
+		JTextField textField = new JTextField(30);// NLP için Text Box ekledim.
+		JButton button = new JButton("Uygula");
+
+		final String[] prediction = new String[1];
+		button.addActionListener(e->{
+								 prediction[0] = obj.predict(KullaniciInput.Lemmatize(textField.getText()));  // Lemmatize ve normalize ve sonra prediction ve uygula
+								ApplyChosenFilter.Applying((prediction[0]).trim());  //Filtre Uygulanması
+		});
+
+		textField.setBounds(120,120,30,10);  // Text Box boyutları
+		contentPane.add(textField);
+
+		contentPane.add(button);
+		button.setBounds(150,120,15,10);  // Button boyutları
+
+
+
+
 	}
+
+
+
+
 	//TODO kullanılmayan kod?
 	/*
 	private void applyTheme(String theme) {

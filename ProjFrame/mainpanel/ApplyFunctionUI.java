@@ -297,6 +297,8 @@ public class ApplyFunctionUI {
 		funcTypePanel.add(shapeButton);
 		funcTypePanel.add(effectButton);
 		TypeFuncScrPane.setViewportView(funcTypePanel);
+
+
 	}
 	public static void Close() {
 		Main.contentPane.remove(functiontab);
@@ -311,10 +313,13 @@ public class ApplyFunctionUI {
 		System.out.println("Applying shape filter...");
 		// Burada istediğiniz işlemi yapabilirsiniz
 	}
+
+
 	
 	
 	public static void applyMedianBlur(String inputPath, String outputPath) {
 		MedianBlur.wPath(Paths.get(inputPath).toAbsolutePath(), Paths.get(outputPath).toAbsolutePath());
+
 	}
 	
 	public static void applyCanny(String inputPath, String outputPath) {
