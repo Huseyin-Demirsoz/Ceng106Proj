@@ -149,7 +149,7 @@ public class Main extends JFrame {
 		FilterClassifier.NaiveBayesModel obj = new InheritFilterClassifier(); // Polymorphism
 
 		obj.train(docDataSet);
-//NLP Eğitimi yapılır.
+		//NLP Eğitimi yapılır.
 
 		connect();
 		Statement stmt=null;
