@@ -44,7 +44,7 @@ public class Table implements Table_methods {
 
 
     }
-
+    
     public String Read() throws IOException {
 
         BufferedReader reader = new BufferedReader(new FileReader(file));
