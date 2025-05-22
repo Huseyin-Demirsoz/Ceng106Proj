@@ -63,7 +63,7 @@ public class DataBaseOpenUI {
 		dbPane.add(btnCreate, gbc_btnCreate);
 		//
 		btnCreate.addActionListener(_ ->{
-			tables.addElement(DataBaseCore.makeProjTable(textField.getText()));
+			tables.addElement(ImgDataBase.makeProjTable(textField.getText()));
 			
 			/*
 			filelistmodel.addElement(database.makeProjTable(textField.getText()));

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -24,10 +25,23 @@ import org.opencv.imgproc.Imgproc;
 
 
 public abstract class DataBaseCore {   // Dosya oluşturur veya siler
-	
-    public ArrayList<Table> tableObj; // Referans dizisi de olabilir.
-    
-    public static String makeProjTable(String name){
+	static String getDBvalues(String tablename) {
+		String str = "";
+		try {
+			Statement stmt = Main.conn.createStatement();
+			ResultSet filesdb = stmt.executeQuery("SELECT * FROM "+ tablename +";");
+			while(filesdb.next()) {
+				str = filesdb.getString("filepath")+'\n'+filesdb.getString("name")+'\n'+str;
+			}
+		}catch(SQLException e) {
+			//TODO error
+		}
+		return str;
+	}
+}
+
+class ImgDataBase extends DataBaseCore{
+	public static String makeProjTable(String name){
     	System.out.println("ok");
     	String nam ="";
     	
@@ -45,103 +59,6 @@ public abstract class DataBaseCore {   // Dosya oluşturur veya siler
 		}
     	return nam;
     }
-    
-    
-    
-    public void makeDB() {
-    	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
-    		new File("input").mkdirs();
-    		new File("output").mkdirs();
-    	}
-    	tableObj = new ArrayList<>();
-    }
-    public File makeDB(String nameofdb)  {
-    	/*
-        //Table_name kullanıcıdan okunabilir
-         String file_name = get_Tablename();
-
-        File file = new File("C:\\Users\\my\\Desktop\\coverDB\\"+ file_name + ".txt");
-
-        file.createNewFile(); // Boolean değer döner. Exception handling için kullanılabilir.
-
-
-        
-    	*/
-    	//Creates new folders
-    	//TODO: TEST ON WINDOWS
-		
-    	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
-    		new File("input").mkdirs();
-    		new File("output").mkdirs();
-    	}
-    	
-    	int i = 0;
-    	while(Files.exists(Path.of("input/"+ nameofdb + i+".txt"))){
-    		i++;
-    	}
-    	File file  = new File("input/"+nameofdb+ i +".txt");
-    	
-		
-		try {
-			file.createNewFile();
-			System.out.printf(file.getAbsolutePath());
-		} catch (IOException e1) {
-			// TODO Handle file not being created
-			e1.printStackTrace();
-		}
-		
-		//Could error from not initialising the list !! TODO
-		//tableObj = new ArrayList<>();
-		
-        tableObj.add( new Table(file,"input/" + file.getName(),"output/" + file.getName()));
-        
-        return file;
-    }
-    public void readDBfromFolder() {
-    	//programımız ilk başladığında input klasörünün içindeki tüm dosyaları okuması için
-    	if(!Files.exists(Path.of("input")) && !Files.exists(Path.of("output"))){
-    		new File("input").mkdirs();
-    		new File("output").mkdirs();
-    	}
-
-    	try {
-    		List<File> filesInFolder = Files.walk(Paths.get("input"))
-                    .filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
-    		for(File file : filesInFolder){
-    	        tableObj.add( new Table(file,"input/" + file.getName(),"output/" + file.getName()));
-    		}
-		} catch (IOException e) {
-			// TODO Coulnd't reach file for either not being able access or file doesn't exist
-			e.printStackTrace();
-		}
-    	
-    }
-    public void deleteDB(Table tb){
-
-        tb = null;
-        System.gc();
-
-        //Dosyayı'da bilgisayardan sil.
-
-    }
-
-    public  String get_Tablename(){
-
-        Scanner input = new Scanner(System.in);
-
-        System.out.print("Dosya adı giriniz");
-
-        String dosAdi = input.nextLine();
-
-        input.close();
-        return dosAdi;
-    }
-	
-}
-class ImgDataBase extends DataBaseCore{
-	
 }
 
 class FunctionDataBase extends DataBaseCore{
@@ -156,11 +73,6 @@ class FunctionDataBase extends DataBaseCore{
 		}
 	}
 	public void Parse(String text){
-		//String text;
-		
-		//text = new Scanner(new File(path)).useDelimiter("\\Z").next();
-		//text =programtext;
-		//int current;
 		Stack<String> progstack = new Stack<String>();
 		Stack<Mat> imgpassingbuff = new Stack<Mat>();
 		enum state{
@@ -237,17 +149,7 @@ class FunctionDataBase extends DataBaseCore{
 									break;
 								}
 							}
-							//TODO Comment
-							/* Bitmiş fonksyonlar:
-								ToGrayScale
-								Gaussian Blur
-								
-								TEST et
-								Canny
-								BrightnContrs
-								Dominant Color
-								
-							*/
+							// This switch case matches a function and runs it
 							switch (text.substring(start, stop)){
 								case "ToGrayScale":{
 										Mat dest = new Mat();
@@ -270,13 +172,21 @@ class FunctionDataBase extends DataBaseCore{
 								case "Dominant Color":{
 										Mat dest = new Mat();
 										Mat in0 = new Mat();
+										int in1 =0;
+										if(progstack.peek().matches("\\d{1,3}")){
+											in1 = Integer.parseInt(progstack.peek());
+											progstack.pop();
+										}else {
+											System.err.println("ERROR: input number.");
+											break;
+										}
 										if(!progstack.peek().equals("stack")){
 											in0 = Imgcodecs.imread(progstack.pop());
 										}else{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = Dominant_Color.wMat(in0);
+										dest = Dominant_Color.wMat(in0,in1);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -305,7 +215,6 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										//TODO
 										//This is a more granular version of canny edge detection, default value is 100, 200
 										//To Grayscale before applying canny
 										List<Mat> color = new ArrayList<Mat>(3);
@@ -400,7 +309,7 @@ class FunctionDataBase extends DataBaseCore{
 										Double R = 0.;
 										Double G = 0.;
 										Double B = 0.;
-										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\\\d{1,8}(\\\\.?\\\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
+										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
 											String[] nums =progstack.peek().split(",");
 											//The gaussian kernel can not be a modulo of 2
 											R = Double.parseDouble(nums[0]);
@@ -426,7 +335,6 @@ class FunctionDataBase extends DataBaseCore{
 											imgpassingbuff.push(dest);
 										}
 									}break;
-									//TODO Add?
 								case "Gaussian Blur":{
 										Mat dest = new Mat();
 										Mat in0 = new Mat();
@@ -457,9 +365,8 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										//dest = in0; // DEBUG NO-OP function
+										
 										Imgproc.GaussianBlur(in0, dest, in1, in2);
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -467,7 +374,118 @@ class FunctionDataBase extends DataBaseCore{
 											imgpassingbuff.push(dest);
 										}
 									}break;
-									
+								case "Median Blur":{
+									Mat dest = new Mat();
+									Mat in0 = new Mat();
+									if(!progstack.peek().equals("stack")){
+										in0 = Imgcodecs.imread(progstack.pop());
+									}else{
+										progstack.pop();
+										in0 = imgpassingbuff.pop();
+									}
+									dest = MedianBlur.wMat(in0);
+									if(!progstack.peek().equals("stack")){
+										Imgcodecs.imwrite(progstack.pop(), dest);
+									}else{
+										progstack.pop();
+										imgpassingbuff.push(dest);
+									}
+								}break;
+								case "Color Inversion":{
+									Mat dest = new Mat();
+									Mat in0 = new Mat();
+									if(!progstack.peek().equals("stack")){
+										in0 = Imgcodecs.imread(progstack.pop());
+									}else{
+										progstack.pop();
+										in0 = imgpassingbuff.pop();
+									}
+									dest = ColorInversion.wMat(in0);
+									if(!progstack.peek().equals("stack")){
+										Imgcodecs.imwrite(progstack.pop(), dest);
+									}else{
+										progstack.pop();
+										imgpassingbuff.push(dest);
+									}
+								}break;
+								case "Motion Blur Effect":{
+									Mat dest = new Mat();
+									Mat in0 = new Mat();
+									if(!progstack.peek().equals("stack")){
+										in0 = Imgcodecs.imread(progstack.pop());
+									}else{
+										progstack.pop();
+										in0 = imgpassingbuff.pop();
+									}
+									dest = MotionBlurEffect.wMat(in0,15);
+									if(!progstack.peek().equals("stack")){
+										Imgcodecs.imwrite(progstack.pop(), dest);
+									}else{
+										progstack.pop();
+										imgpassingbuff.push(dest);
+									}
+								}break;
+								case "Vignette Effect":{
+									Mat dest = new Mat();
+									Mat in0 = new Mat();
+									if(!progstack.peek().equals("stack")){
+										in0 = Imgcodecs.imread(progstack.pop());
+									}else{
+										progstack.pop();
+										in0 = imgpassingbuff.pop();
+									}
+									dest = VignetteEffect.wMat(in0,15);
+									if(!progstack.peek().equals("stack")){
+										Imgcodecs.imwrite(progstack.pop(), dest);
+									}else{
+										progstack.pop();
+										imgpassingbuff.push(dest);
+									}
+								}break;
+								case "Pixel Effect":{
+									Mat dest = new Mat();
+									Mat in0 = new Mat();
+									Size in1;
+									if(progstack.peek().matches("\\d{1,8},\\d{1,8}")){
+										String[] nums =progstack.peek().split(",");
+										//The gaussian kernel can not be a modulo of 2
+										in1= new Size(Double.parseDouble(nums[0]),Double.parseDouble(nums[1]));
+										progstack.pop();
+									}else {
+										System.err.println("ERROR: Bad size");
+										break;
+									}
+									if(!progstack.peek().equals("stack")){
+										in0 = Imgcodecs.imread(progstack.pop());
+									}else{
+										progstack.pop();
+										in0 = imgpassingbuff.pop();
+									}
+									dest = PixelEffect.wMat(in0,in1.width,in1.height);
+									if(!progstack.peek().equals("stack")){
+										Imgcodecs.imwrite(progstack.pop(), dest);
+									}else{
+										progstack.pop();
+										imgpassingbuff.push(dest);
+									}
+								}break;
+								case "Color Tint Effect":{
+									Mat dest = new Mat();
+									Mat in0 = new Mat();
+									if(!progstack.peek().equals("stack")){
+										in0 = Imgcodecs.imread(progstack.pop());
+									}else{
+										progstack.pop();
+										in0 = imgpassingbuff.pop();
+									}
+									dest = ColorTintEffect.wMat(in0);
+									if(!progstack.peek().equals("stack")){
+										Imgcodecs.imwrite(progstack.pop(), dest);
+									}else{
+										progstack.pop();
+										imgpassingbuff.push(dest);
+									}
+								}break;
 							}
 						}break;
 					}
@@ -492,36 +510,10 @@ class FunctionDataBase extends DataBaseCore{
 			System.out.println( progstack.pop());
 		}
 		
+		System.out.println("Done!");
+		
 		text =null;
 		System.gc();
-		
-		
-		/*
-		Scanner text;
-		try {
-			text = new Scanner(tableObj.get(0).file).useDelimiter("\\S");
-			String current;
-			enum state{
-				CODE,COMMENT
-			} 
-			state status=state.CODE;
-			while(text.hasNext()) {
-				current = text.next();
-				if(current=="/") {
-					if(text.) {
-						text.skip("\\*\\/");
-					}
-				}
-			}
-			text.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
 	}
 }
 

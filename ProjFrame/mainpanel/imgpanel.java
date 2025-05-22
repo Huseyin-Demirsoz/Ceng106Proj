@@ -6,6 +6,8 @@ import java.awt.Image;
 
 import javax.swing.JPanel;
 
+
+//This is the class used to paint the image for our program
 public final class imgpanel extends JPanel{
 	private static final long serialVersionUID = 5805543053359120595L;
 	Image img;

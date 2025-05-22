@@ -15,17 +15,6 @@ import org.opencv.core.TermCriteria;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-/*
-abstract class FunctionInterface {
-
-	public void wPath(Path input, Path output, double... args){
-		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
-		Mat outputmat = Imgcodecs.imread(output.toAbsolutePath().toString());
-		wMat(inputmat, outputmat, args);
-	}
-	static abstract public void wMat(Mat input, Mat output, double... args);
-}
-*/
 
 interface FunctionInterface {
 	public static void wPath(Path input, Path output, double... args) {}
@@ -314,23 +303,6 @@ abstract class ColorInversion implements FunctionInterface{
 	/*MARK END*/
 	
 	public static Mat wMat(Mat input, double... args) {
-	  	/* 
-		Mat img = Imgcodecs.imread(inputPath);
-		if (img.empty()) {
-			System.out.println("❌ Could not load image from: " + inputPath);
-			return;
-		}
-		
-		Mat inverted = new Mat();
-		Core.bitwise_not(img, inverted);
-		
-		boolean success = Imgcodecs.imwrite(outputPath, inverted);
-		if (success) {
-			System.out.println("✅ Color inversion saved to " + outputPath);
-		} else {
-			System.out.println("❌ Failed to save color inversion.");
-		}
-			*/
 			
 			//aşağısı try catch li ama kaydetme kısmı galiba try catchi hangisini beğenirseniz onu kullanabilirsiniz
 			
@@ -366,18 +338,6 @@ abstract class MotionBlurEffect implements FunctionInterface{
 	public static Mat wMat(Mat input, double... args) {
 	  	Mat src = input;
 	  	int kernelSize =(int) Math.round(args[0]);
-		/*
-	  	try {
-			src = Imgcodecs.imread(inputPath);
-			if (src.empty()) {
-				System.out.println("❌ Could not load image");
-				return input;
-			}
-		} catch (Exception e) {
-			System.out.println("❌ Error loading image: " + e.getMessage());
-			return input;
-		}
-		*/
 		
 		// Kernel oluşturuluyor
 		Mat kernel = Mat.zeros(kernelSize, kernelSize, CvType.CV_32F);
@@ -393,19 +353,7 @@ abstract class MotionBlurEffect implements FunctionInterface{
 			System.out.println("❌ Error applying motion blur: " + e.getMessage());
 			return input;
 		}
-		/*
-		// Çıkış dosyasını kaydetme işlemi
-		try {
-			boolean success = Imgcodecs.imwrite(outputPath, dst);
-			if (success) {
-				System.out.println("✅ Motion blur applied and saved to " + outputPath);
-			} else {
-				System.out.println("❌ Failed to save motion blurred image.");
-			}
-		} catch (Exception e) {
-			System.out.println("❌ Error saving image: " + e.getMessage());
-		}
-		*/
+		
 	    return dst;
 	}
 	
@@ -428,19 +376,11 @@ abstract class VignetteEffect implements FunctionInterface{
 		Mat vignette = new Mat();
 		Core.multiply(src, mask, vignette, 1, CvType.CV_8UC3);
 		
-		/*
-		boolean success = Imgcodecs.imwrite(outputPath, vignette);
-		if (success) {
-			System.out.println("✅ Vignette effect saved to " + outputPath);
-		} else {
-			System.out.println("❌ Failed to save vignette image.");
-		}
-		*/
 	    return vignette;
 	}
 	//bu kısım gerekli vignette efekti için
 	
-	public static Mat createVignetteMask(Mat src) {
+	private static Mat createVignetteMask(Mat src) {
 		int rows = src.rows();
 		int cols = src.cols();
 		
@@ -482,14 +422,7 @@ abstract class PixelEffect implements FunctionInterface{
 		
 		Mat pixelated = new Mat();
 		Imgproc.resize(tmp, pixelated, src.size(), 0, 0, Imgproc.INTER_NEAREST);
-		/*
-		boolean success = Imgcodecs.imwrite(outputPath, pixelated);
-		if (success) {
-			System.out.println("✅ Pixelation effect saved to " + outputPath);
-		} else {
-			System.out.println("❌ Failed to save pixelated image.");
-		}
-		*/
+		
 	    return pixelated;
 	}
 	
@@ -513,33 +446,9 @@ abstract class ColorTintEffect implements FunctionInterface{
 		
 		// Mavi ton ekle (mavi kanalını artır)
 		Core.add(tinted, new Scalar(50, 0, 0), tinted); // BGR: (Blue, Green, Red)
-		/*
-		boolean success = Imgcodecs.imwrite(outputPath, tinted);
-		if (success) {
-			System.out.println("✅ Blue-tinted image saved!");
-		} else {
-			System.out.println("❌ Failed to save blue-tinted image.");
-		}
-		*/
+		
 	    return tinted;
 	}
 	
-}/*
-class MedianBlur implements FunctionInterface{
-	
-	public static void wPath(Path input, Path output, double... args) {
-		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
-		Imgcodecs.imwrite(output.toAbsolutePath().toString(), wMat(inputmat, args));
-	}
-	
-	public static Mat wMat(Mat input, double... args) {
-	  	Mat src = input;
-	  	Mat dst = new Mat();
-	  	Imgproc.medianBlur(src, dst, 5);
-	    return dst;
-	}
-	
 }
-*/
-
 

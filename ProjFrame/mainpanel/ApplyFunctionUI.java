@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import org.opencv.imgproc.Imgproc;
 
 public class ApplyFunctionUI {
 	private static JTabbedPane functiontab;
-	public static void Open() {//JTabbedPane functiontab,File Main.getselectedfile()in) {
+	public static void Open() {
 		
 		functiontab = new JTabbedPane(JTabbedPane.TOP);
 		Main.contentPane.add(functiontab, BorderLayout.EAST);
@@ -296,7 +297,7 @@ public class ApplyFunctionUI {
 		funcTypePanel.add(effectButton);
 		TypeFuncScrPane.setViewportView(funcTypePanel);
 
-
+		
 	}
 	public static void Close() {
 		Main.contentPane.remove(functiontab);
