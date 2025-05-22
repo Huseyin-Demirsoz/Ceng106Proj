@@ -32,7 +32,7 @@ interface FunctionInterface {
 	public static Mat wMat(Mat input, double... args) {return input;}
 }
 
-class ToGray implements FunctionInterface{
+abstract class ToGray implements FunctionInterface{
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
 		Imgcodecs.imwrite(output.toAbsolutePath().toString(), wMat(inputmat, args));
@@ -51,7 +51,7 @@ class ToGray implements FunctionInterface{
 	}
 }
 
-class Dominant_Color  implements FunctionInterface{
+abstract class Dominant_Color  implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -99,13 +99,14 @@ class Dominant_Color  implements FunctionInterface{
 	}
 	
 }
-class Canny implements FunctionInterface{
+abstract class Canny implements FunctionInterface{
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
 		Imgcodecs.imwrite(output.toAbsolutePath().toString(), wMat(inputmat, args));
 	}
 	
 	public static Mat wMat(Mat input, double... args) {
+		//args unused
 	    Mat gray = new Mat();
 	    Mat edges = new Mat();
 	    //Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
@@ -115,7 +116,7 @@ class Canny implements FunctionInterface{
 	}
 	
 }
-class BrightnessContrast implements FunctionInterface{
+abstract class BrightnessContrast implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -123,6 +124,7 @@ class BrightnessContrast implements FunctionInterface{
 	}
 	
 	public static Mat wMat(Mat input, double... args) {
+		//alpha beta can be set to 1.5, 50
 		Mat src = input;
 	    Mat dst = new Mat();
 	    src.convertTo(dst, -1, args[0], args[1]);
@@ -131,7 +133,7 @@ class BrightnessContrast implements FunctionInterface{
 	
 }
 
-class SketchEffect implements FunctionInterface{
+abstract class SketchEffect implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -160,7 +162,7 @@ class SketchEffect implements FunctionInterface{
 	}
 	
 }
-class MedianBlur implements FunctionInterface{
+abstract class MedianBlur implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -176,7 +178,7 @@ class MedianBlur implements FunctionInterface{
 	
 }
 
-class CartoonPrepEffect implements FunctionInterface{
+abstract class CartoonPrepEffect implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -203,7 +205,7 @@ class CartoonPrepEffect implements FunctionInterface{
 	}
 	
 }
-class SobelEdge implements FunctionInterface{
+abstract class SobelEdge implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -233,7 +235,7 @@ class SobelEdge implements FunctionInterface{
 	}
 	
 }
-class RgbFilter implements FunctionInterface{
+abstract class RgbFilter implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -294,7 +296,7 @@ class RgbFilter implements FunctionInterface{
 	}
 	
 }
-class ColorInversion implements FunctionInterface{
+abstract class ColorInversion implements FunctionInterface{
 	
 	/*MARK START*/
 	public static void wPath(Path input, Path output, double... args) {
@@ -354,7 +356,7 @@ class ColorInversion implements FunctionInterface{
 	}
 	
 }
-class MotionBlurEffect implements FunctionInterface{
+abstract class MotionBlurEffect implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -408,7 +410,7 @@ class MotionBlurEffect implements FunctionInterface{
 	}
 	
 }
-class VignetteEffect implements FunctionInterface{
+abstract class VignetteEffect implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -459,7 +461,7 @@ class VignetteEffect implements FunctionInterface{
 	}
 	
 }
-class PixelEffect implements FunctionInterface{
+abstract class PixelEffect implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());
@@ -492,7 +494,7 @@ class PixelEffect implements FunctionInterface{
 	}
 	
 }
-class ColorTintEffect implements FunctionInterface{
+abstract class ColorTintEffect implements FunctionInterface{
 	
 	public static void wPath(Path input, Path output, double... args) {
 		Mat inputmat = Imgcodecs.imread(input.toAbsolutePath().toString());

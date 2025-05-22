@@ -13,7 +13,7 @@ import java.util.List;
 public class Documentation {
 
     public static List<FilterClassifier.Document> DocumateTheWords() throws Exception {
-        Path csvPath = Paths.get("C:\\Users\\my\\Documents\\Filter NLP Data Set\\Preprocessed DataSet20.csv");
+        Path csvPath = Paths.get("Preprocessed DataSet20.csv");
 
         List<FilterClassifier.Document> documents = new ArrayList<>();
         BufferedReader reader = null;

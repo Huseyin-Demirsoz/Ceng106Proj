@@ -31,13 +31,11 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 public class ApplyFunctionUI {
-	static File selectedfile;
 	private static JTabbedPane functiontab;
-	public static void Open() {//JTabbedPane functiontab,File selectedfilein) {
+	public static void Open() {//JTabbedPane functiontab,File Main.getselectedfile()in) {
 		
 		functiontab = new JTabbedPane(JTabbedPane.TOP);
 		Main.contentPane.add(functiontab, BorderLayout.EAST);
-		selectedfile = Main.selectedfile;
 		//TODO yorum
 		JScrollPane TypeFuncScrPane = new JScrollPane();  // Yeni nesne!
 		functiontab.addTab("Func. type", null, TypeFuncScrPane, null);
@@ -67,7 +65,7 @@ public class ApplyFunctionUI {
 			medianBlurButton.setMaximumSize(new Dimension(200, 50));
 			medianBlurButton.setPreferredSize(new Dimension(200, 50));
 			medianBlurButton.addActionListener(_ -> 
-				applyMedianBlur(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath())
+				applyMedianBlur(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath())
 			);
 			
 			JButton cannyButton = new JButton("Apply Canny Edge Detection");
@@ -75,7 +73,7 @@ public class ApplyFunctionUI {
 			cannyButton.setMaximumSize(new Dimension(200, 50));
 			cannyButton.setPreferredSize(new Dimension(200, 50));
 			cannyButton.addActionListener(_ -> 
-				applyCanny(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath())
+				applyCanny(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath())
 			);
 			
 			JButton brightnessContrastButton = new JButton("Adjust Brightness & Contrast");
@@ -84,7 +82,7 @@ public class ApplyFunctionUI {
 			brightnessContrastButton.setPreferredSize(new Dimension(200, 50));
 			
 			brightnessContrastButton.addActionListener(_ -> 
-				adjustBrightnessContrast(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath(), 1.5, 50)
+				adjustBrightnessContrast(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath(), 1.5, 50)
 			);
 			
 			JButton kMeansButton = new JButton("Apply K-Means Color Clustering");
@@ -92,7 +90,7 @@ public class ApplyFunctionUI {
 			kMeansButton.setMaximumSize(new Dimension(200, 50));
 			kMeansButton.setPreferredSize(new Dimension(200, 50));
 				kMeansButton.addActionListener(_ -> 
-				applyDominantColorKMeans(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath(), 5)
+				applyDominantColorKMeans(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath(), 5)
 			);
 				JPanel rgbPanel = new JPanel();
 				rgbPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -125,7 +123,7 @@ public class ApplyFunctionUI {
 						int r = Integer.parseInt(rField.getText());
 						int g = Integer.parseInt(gField.getText());
 						int b = Integer.parseInt(bField.getText());
-						applyRgbFilter(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath(),r, g, b);
+						applyRgbFilter(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath(),r, g, b);
 					} catch (NumberFormatException ex) {
 						JOptionPane.showMessageDialog(null, "Geçerli RGB değerleri girin (0-255).");
 					}
@@ -160,7 +158,7 @@ public class ApplyFunctionUI {
 			sketchButton.setMaximumSize(new Dimension(200, 50));
 			sketchButton.setPreferredSize(new Dimension(200, 50));
 			sketchButton.addActionListener(_ ->
-				applySketchEffect(selectedfile.getAbsolutePath(),selectedfile.getAbsolutePath())
+				applySketchEffect(Main.getselectedfile().getAbsolutePath(),Main.getselectedfile().getAbsolutePath())
 			);
 			
 			// Cartoon Prep Effect butonu
@@ -169,7 +167,7 @@ public class ApplyFunctionUI {
 			cartoonButton.setMaximumSize(new Dimension(200, 50));
 			cartoonButton.setPreferredSize(new Dimension(200, 50));
 			cartoonButton.addActionListener(_ ->
-				applyCartoonPrepEffect(selectedfile.getAbsolutePath(),selectedfile.getAbsolutePath())
+				applyCartoonPrepEffect(Main.getselectedfile().getAbsolutePath(),Main.getselectedfile().getAbsolutePath())
 			);
 			
 			// Sobel Edge butonu
@@ -178,7 +176,7 @@ public class ApplyFunctionUI {
 			sobelButton.setMaximumSize(new Dimension(200, 50));
 			sobelButton.setPreferredSize(new Dimension(200, 50));
 			sobelButton.addActionListener(_ ->
-				applySobelEdge(selectedfile.getAbsolutePath(),selectedfile.getAbsolutePath())
+				applySobelEdge(Main.getselectedfile().getAbsolutePath(),Main.getselectedfile().getAbsolutePath())
 			);
 			// Color Inversion butonu
 						JButton inversionButton = new JButton("Apply Color Inversion");
@@ -187,7 +185,7 @@ public class ApplyFunctionUI {
 						inversionButton.setMaximumSize(new Dimension(200, 50));
 						inversionButton.setPreferredSize(new Dimension(200, 50));
 						inversionButton.addActionListener(_ ->
-							applyColorInversion(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath())
+							applyColorInversion(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath())
 						);
 						
 						// Color Tint Effect butonu
@@ -196,7 +194,7 @@ public class ApplyFunctionUI {
 						tintButton.setMaximumSize(new Dimension(200, 50));
 						tintButton.setPreferredSize(new Dimension(200, 50));
 						tintButton.addActionListener(_ ->
-							applyColorTintEffect(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath())
+							applyColorTintEffect(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath())
 						);
 						// Vignette Effect butonu
 						JButton vignetteButton = new JButton("Apply Vignette Effect");
@@ -204,7 +202,7 @@ public class ApplyFunctionUI {
 						vignetteButton.setMaximumSize(new Dimension(200, 50));
 						vignetteButton.setPreferredSize(new Dimension(200, 50));
 						vignetteButton.addActionListener(_ ->
-							applyVignetteEffect(selectedfile.getAbsolutePath(), selectedfile.getAbsolutePath())
+							applyVignetteEffect(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath())
 						);
 						
 						
@@ -214,7 +212,7 @@ public class ApplyFunctionUI {
 						motionBlurButton.setMaximumSize(new Dimension(200, 50));
 						motionBlurButton.setPreferredSize(new Dimension(200, 50));
 						motionBlurButton.addActionListener(_ ->
-							applyMotionBlurEffect(selectedfile.getAbsolutePath(),selectedfile.getAbsolutePath(), 15)
+							applyMotionBlurEffect(Main.getselectedfile().getAbsolutePath(),Main.getselectedfile().getAbsolutePath(), 15)
 						);
 						
 						
@@ -242,8 +240,8 @@ public class ApplyFunctionUI {
 								if (size <= 0) throw new NumberFormatException();
 								
 								applyPixelEffect(
-									selectedfile.getAbsolutePath(),
-									selectedfile.getAbsolutePath()
+									Main.getselectedfile().getAbsolutePath(),
+									Main.getselectedfile().getAbsolutePath()
 									,new Size(size, size)
 								);
 								

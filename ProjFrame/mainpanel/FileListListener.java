@@ -17,12 +17,12 @@ import org.opencv.highgui.HighGui;
 public class FileListListener {
 	public static void listListener(JScrollPane scrollPane_1,JList<String> sublist,imgpanel mainImage,JPanel contentPane,DefaultListModel<String> activefiles) {
 		if(sublist.getSelectedIndex()+1>0) {
-			Main.selectedfile = new File(activefiles.get(sublist.getSelectedIndex()));
+			Main.setselectedfile(new File(activefiles.get(sublist.getSelectedIndex())));
 		}else {
 			return;
 		}
-		if(Main.selectedfile.getName().endsWith(".jpg") || Main.selectedfile.getName().endsWith(".png")){
-		Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(Main.selectedfile.getAbsolutePath());
+		if(Main.getselectedfile().getName().endsWith(".jpg") || Main.getselectedfile().getName().endsWith(".png")){
+		Mat image_tmp = org.opencv.imgcodecs.Imgcodecs.imread(Main.getselectedfile().getAbsolutePath());
 		Image bufImage = HighGui.toBufferedImage(image_tmp);
 		//TODO
 		//mainImage.setimg(bufImage);
@@ -93,6 +93,6 @@ public class FileListListener {
 		image_tmp.release();
 		bufImage.flush();
 		}
-		ApplyFunctionUI.selectedfile = Main.selectedfile;
+		
 	}
 }

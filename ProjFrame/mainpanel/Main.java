@@ -54,19 +54,20 @@ public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	static JPanel contentPane;
-	static File selectedfile ;//TODO
-	static int selectedindex;
+	private static File selectedfile ;//TODO
+	static int selectedindex;//TODO Make private and add get set
 	static Connection conn;
 
 
 	
-	/*static {
+	static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    }*/
-
+    }
+	/*
 	static{
 		System.load("C:\\Users\\my\\Documents\\NewOpenCV\\opencv\\build\\java\\x64\\opencv_java4110.dll");
 	}
+	*/
 	/*
 	The main function dispatches the public constructor as a main thread //TODO ingilizce
 	Main fonksiyonu "main"den public constructor programın ana fonksiyonu olarak açılır
@@ -101,8 +102,8 @@ public class Main extends JFrame {
         // connection string
 		 conn = null;
 		try {
-			//var url = "jdbc:sqlite:database.db";
-			String url = "jdbc:sqlite:C:\\Users\\my\\Documents\\SQL Lite for Java\\database.db";
+			var url = "jdbc:sqlite:database.db";
+			//String url = "jdbc:sqlite:C:\\Users\\my\\Documents\\SQL Lite for Java\\database.db";
 			try {
 				conn = DriverManager.getConnection(url);
 				System.out.println("Connection to SQLite has been established.");
@@ -415,10 +416,10 @@ public class Main extends JFrame {
 		JTextField textField = new JTextField(30);// NLP için Text Box ekledim.
 		JButton button = new JButton("Uygula");
 
-		final String[] prediction = new String[1];
+		//final String[] prediction = new String[1];
 		button.addActionListener(e->{
-								 prediction[0] = obj.predict(KullaniciInput.Lemmatize(textField.getText()));  // Lemmatize ve normalize ve sonra prediction ve uygula
-								ApplyChosenFilter.Applying((prediction[0]).trim());  //Filtre Uygulanması
+			String prediction = obj.predict(KullaniciInput.Lemmatize(textField.getText()));  // Lemmatize ve normalize ve sonra prediction ve uygula
+			ApplyChosenFilter.Applying(prediction.trim());  //Filtre Uygulanması
 		});
 
 		textField.setBounds(120,120,30,10);  // Text Box boyutları
@@ -484,5 +485,16 @@ public class Main extends JFrame {
             	updateComponentColors((JPanel) comp, foreground, background);
         	}
     	}
+	}
+	
+	public static File getselectedfile() {
+		return selectedfile;
+	}
+	public static void setselectedfile(File fileToSet) {
+		if(fileToSet.exists() && !fileToSet.isDirectory()) { 
+			selectedfile = fileToSet;
+		}else {
+			//TODO error
+		}
 	}
 }

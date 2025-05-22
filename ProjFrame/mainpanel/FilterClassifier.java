@@ -41,7 +41,7 @@ public class FilterClassifier{
         String predict(List<String> lemmatizedWords) {
             double bestScore = Double.NEGATIVE_INFINITY;
             String bestLabel = null;
-
+            
             for (String label : labelCounts.keySet()) {
                 double logProb = Math.log(labelCounts.get(label) / (double) totalDocuments);
 

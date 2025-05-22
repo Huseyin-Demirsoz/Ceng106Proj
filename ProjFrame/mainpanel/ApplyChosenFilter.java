@@ -9,32 +9,32 @@ public class ApplyChosenFilter {
 
             case "Sobel":
 
-                ApplyFunctionUI.applySobelEdge(Main.selectedfile.getAbsolutePath(), Main.selectedfile.getAbsolutePath());
+                ApplyFunctionUI.applySobelEdge(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath());
 
                 break;
 
             case "SketchEffect":
 
-                ApplyFunctionUI.applySketchEffect(Main.selectedfile.getAbsolutePath(), Main.selectedfile.getAbsolutePath());
+                ApplyFunctionUI.applySketchEffect(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath());
 
                 break;
 
             case "BrightAndContrastAdjustment":
 
-                ApplyFunctionUI.adjustBrightnessContrast(Main.selectedfile.getAbsolutePath(), Main.selectedfile.getAbsolutePath(), 50, 50);
+                ApplyFunctionUI.adjustBrightnessContrast(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath(), 50, 50);
 
                 break;
 
             case "Cartoon":
 
-                ApplyFunctionUI.applyCartoonPrepEffect(Main.selectedfile.getAbsolutePath(), Main.selectedfile.getAbsolutePath());
+                ApplyFunctionUI.applyCartoonPrepEffect(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath());
 
 
                 break;
 
             case "DominantColor":
 
-                ApplyFunctionUI.applyDominantColorKMeans(Main.selectedfile.getAbsolutePath(), Main.selectedfile.getAbsolutePath(), 5);
+                ApplyFunctionUI.applyDominantColorKMeans(Main.getselectedfile().getAbsolutePath(), Main.getselectedfile().getAbsolutePath(), 5);
 
 
                 break;

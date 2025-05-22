@@ -237,11 +237,16 @@ class FunctionDataBase extends DataBaseCore{
 									break;
 								}
 							}
+							//TODO Comment
 							/* Bitmiş fonksyonlar:
 								ToGrayScale
 								Gaussian Blur
+								
+								TEST et
 								Canny
-							
+								BrightnContrs
+								Dominant Color
+								
 							*/
 							switch (text.substring(start, stop)){
 								case "ToGrayScale":{
@@ -271,8 +276,7 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = Dominant_Color.wMat(in0); // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										dest = Dominant_Color.wMat(in0);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -283,7 +287,8 @@ class FunctionDataBase extends DataBaseCore{
 								case "Canny":{
 										Mat dest = new Mat();
 										Mat in0 = new Mat();
-										Double in1=0.,in2=0.;
+										Double in1=0.;
+										Double in2=0.;
 										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
 											String[] nums =progstack.peek().split(",");
 											//The gaussian kernel can not be a modulo of 2
@@ -300,8 +305,8 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										//dest = in0; // DEBUG NO-OP function
-										
+										//TODO
+										//This is a more granular version of canny edge detection, default value is 100, 200
 										//To Grayscale before applying canny
 										List<Mat> color = new ArrayList<Mat>(3);
 										Imgproc.cvtColor(in0, in0, Imgproc.COLOR_RGB2HSV);
@@ -312,6 +317,8 @@ class FunctionDataBase extends DataBaseCore{
 										
 										
 										Imgproc.Canny(in0,dest, in1, in2);
+										
+										//dest = Canny.wMat(in0);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -328,8 +335,7 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										dest = BrightnessContrast.wMat(in0, 1.5, 50.);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -346,8 +352,7 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										dest = SketchEffect.wMat(in0);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -364,8 +369,7 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										dest = SobelEdge.wMat(in0);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -382,26 +386,7 @@ class FunctionDataBase extends DataBaseCore{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
-										if(!progstack.peek().equals("stack")){
-											Imgcodecs.imwrite(progstack.pop(), dest);
-										}else{
-											progstack.pop();
-											imgpassingbuff.push(dest);
-										}
-									}break;
-								case "Text Detection":{
-										Mat dest = new Mat();
-										Mat in0 = new Mat();
-										if(!progstack.peek().equals("stack")){
-											in0 = Imgcodecs.imread(progstack.pop());
-										}else{
-											progstack.pop();
-											in0 = imgpassingbuff.pop();
-										}
-										dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										dest = CartoonPrepEffect.wMat(in0);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -412,14 +397,28 @@ class FunctionDataBase extends DataBaseCore{
 								case "RGB Manipulation":{
 										Mat dest = new Mat();
 										Mat in0 = new Mat();
+										Double R = 0.;
+										Double G = 0.;
+										Double B = 0.;
+										if(progstack.peek().matches("\\d{1,8}(\\.?\\d{0,8}),\\\\d{1,8}(\\\\.?\\\\d{0,8}),\\d{1,8}(\\.?\\d{0,8})")){
+											String[] nums =progstack.peek().split(",");
+											//The gaussian kernel can not be a modulo of 2
+											R = Double.parseDouble(nums[0]);
+											G = Double.parseDouble(nums[1]);
+											B = Double.parseDouble(nums[2]);
+											progstack.pop();
+										}else {
+											System.err.println("ERROR: Bad rgb values");
+											break;
+										}
+										
 										if(!progstack.peek().equals("stack")){
 											in0 = Imgcodecs.imread(progstack.pop());
 										}else{
 											progstack.pop();
 											in0 = imgpassingbuff.pop();
 										}
-										dest = in0; // DEBUG NO-OP function
-										//Imgproc.cvtColor(in0, dest, Imgproc.COLOR_RGB2GRAY);
+										dest = RgbFilter.wMat(in0,R,G,B);
 										if(!progstack.peek().equals("stack")){
 											Imgcodecs.imwrite(progstack.pop(), dest);
 										}else{
@@ -427,6 +426,7 @@ class FunctionDataBase extends DataBaseCore{
 											imgpassingbuff.push(dest);
 										}
 									}break;
+									//TODO Add?
 								case "Gaussian Blur":{
 										Mat dest = new Mat();
 										Mat in0 = new Mat();
