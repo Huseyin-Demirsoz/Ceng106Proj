@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 //This is the class used to paint the image for our program
 public final class imgpanel extends JPanel{
 	private static final long serialVersionUID = 5805543053359120595L;
-	Image img;
+	private Image img;
 	protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             g.setPaintMode();
@@ -25,8 +25,5 @@ public final class imgpanel extends JPanel{
 	void setimg(Image imgx){
 		img=imgx;
 	}
-	public void pack() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }

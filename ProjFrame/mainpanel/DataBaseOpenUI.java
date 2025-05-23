@@ -64,55 +64,9 @@ public class DataBaseOpenUI {
 		//
 		btnCreate.addActionListener(_ ->{
 			tables.addElement(ImgDataBase.makeProjTable(textField.getText()));
-			
-			/*
-			filelistmodel.addElement(database.makeProjTable(textField.getText()));
-			//filelistmodel.addElement(filelistmodel.addfile(file));
-
-			super_list_1.addLast(new JList<FileListDataModel>());
-
-			List<DefaultListModel> projlistmodel = new ArrayList<DefaultListModel>();
-
-			projlistmodel.addLast(new DefaultListModel<Object>());
-			projlistmodel.getLast().add(0, filelistmodel.lastElement());
-			super_list_1.getLast().setModel(projlistmodel.getLast());
-			*/
 		});
 		
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("image");
-		GridBagConstraints gbc_rdbtnNewRadioButton = new GridBagConstraints();
-		gbc_rdbtnNewRadioButton.insets = new Insets(0, 0, 5, 5);
-		gbc_rdbtnNewRadioButton.gridx = 4;
-		gbc_rdbtnNewRadioButton.gridy = 3;
-		dbPane.add(rdbtnNewRadioButton, gbc_rdbtnNewRadioButton);
 		
-		JButton btnCancel = new JButton("Cancel");
-		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-		gbc_btnCancel.insets = new Insets(0, 0, 5, 0);
-		gbc_btnCancel.gridx = 5;
-		gbc_btnCancel.gridy = 3;
-		dbPane.add(btnCancel, gbc_btnCancel);
-		
-		JRadioButton rdbtnFunction = new JRadioButton("function");
-		GridBagConstraints gbc_rdbtnFunction = new GridBagConstraints();
-		gbc_rdbtnFunction.insets = new Insets(0, 0, 5, 5);
-		gbc_rdbtnFunction.gridx = 4;
-		gbc_rdbtnFunction.gridy = 4;
-		dbPane.add(rdbtnFunction, gbc_rdbtnFunction);
-		
-		JRadioButton rdbtnProject = new JRadioButton("project");
-		GridBagConstraints gbc_rdbtnProject = new GridBagConstraints();
-		gbc_rdbtnProject.insets = new Insets(0, 0, 0, 5);
-		gbc_rdbtnProject.gridx = 4;
-		gbc_rdbtnProject.gridy = 5;
-		dbPane.add(rdbtnProject, gbc_rdbtnProject);
-		
-		/*
-		dbPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		//text editor for fields
-		JEditorPane editorPane = new javax.swing.JEditorPane();
-		dbPane.add(editorPane, BorderLayout.SOUTH);
-		*/
 		dbPane.setBackground(contentPane.getBackground());
 		dbPane.setForeground(contentPane.getForeground());
 		for(Component comp :dbPane.getComponents()){

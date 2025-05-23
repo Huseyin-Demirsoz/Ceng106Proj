@@ -86,7 +86,7 @@ public class Main extends JFrame {
 		
 	}
 
-	public static void connect() {
+	private static void connect() {
 		// connection string
 		conn = null;
 		String url = "jdbc:sqlite:database.db";
