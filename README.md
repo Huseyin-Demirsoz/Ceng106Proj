@@ -22,9 +22,9 @@ outputs:
 ---
 ## Instructions
   Download required libraries.
-OpenCV 4.11.0 from: [text link](https://opencv.org/releases/)
-sqlite: [text link](https://github.com/xerial/sqlite-jdbc)
-zemberek: [text link](https://github.com/ahmetaa/zemberek-nlp)
+OpenCV 4.11.0 from: [https://opencv.org/releases/](https://opencv.org/releases/)
+sqlite: [https://github.com/xerial/sqlite-jdbc](https://github.com/xerial/sqlite-jdbc)
+zemberek: [https://github.com/ahmetaa/zemberek-nlp](https://github.com/ahmetaa/zemberek-nlp)
 ---
 ### Common errors:
   1. Incorrectly set dataset.csv path: if the NLP functionality is not working set the .csv path of the dataset in Documentation.java to the absolute path of the dataset.
