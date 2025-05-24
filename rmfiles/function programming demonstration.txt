@@ -1,0 +1,75 @@
+/* this is how the function programming is used 
+# "output"
+# "input"
+# "parameter"
+% "function name"
+*/
+
+/* Code below is how every function is called, may be slow on some computers
+To run, bulk replace $OUTPUT FOLDER$ , $SOURCE IMAGE FOLDER$ and imagename.png*/
+
+# "$OUTPUT FOLDER$gray.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "ToGrayScale" 
+
+# "$OUTPUT FOLDER$gauss.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+# "11.0,11.0"
+# "0.0"
+% "Gaussian Blur"
+
+# "$OUTPUT FOLDER$dominant.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+# "5"
+% "Dominant Color" 
+
+# "$OUTPUT FOLDER$canny.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+# "100,200"
+% "Canny" 
+
+# "$OUTPUT FOLDER$bright.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Bright and Contrast" 
+
+# "$OUTPUT FOLDER$Sketch.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Sketch Effect" 
+
+# "$OUTPUT FOLDER$Sobel.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Sobel"
+
+# "$OUTPUT FOLDER$Cartoon.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Cartoon"
+
+# "$OUTPUT FOLDER$RGB.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+# "50.0,50.0,50.0"
+% "RGB Manipulation"
+ 
+# "$OUTPUT FOLDER$Median.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Median Blur" 
+
+# "$OUTPUT FOLDER$Inversion.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Color Inversion" 
+
+# "$OUTPUT FOLDER$Motion.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Motion Blur Effect" 
+
+# "$OUTPUT FOLDER$Vignette.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Vignette Effect" 
+
+# "$OUTPUT FOLDER$Pixel.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png"
+# "50,50"
+% "Pixel Effect" 
+
+# "$OUTPUT FOLDER$Tint.png" 
+# "$SOURCE IMAGE FOLDER$imagename.png" 
+% "Color Tint Effect" 
